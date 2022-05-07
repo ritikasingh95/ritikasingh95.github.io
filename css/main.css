@@ -74,7 +74,7 @@ body {
 	font-family: "lora-regular", serif;
 	font-size: 1.7rem;
 	line-height: 3rem;
-	color: #6e6e6e;
+	color: black;
 }
 
 /**
@@ -101,7 +101,7 @@ a:hover, a:focus, a:active {
  * ------------------------------------------------------------------- 
  */
 h1, h2, h3, h4, h5, h6, .h01, .h02, .h03, .h04, .h05, .h06 {
-	font-family: "poppins-semibold", sans-serif;
+	font-family: "lora-regular", sans-serif, ;
 	color: #313131;
 	font-style: normal;
 	text-rendering: optimizeLegibility;
@@ -111,7 +111,7 @@ h3, .h03, h4, .h04 {
 	margin-bottom: 1.8rem;
 }
 h5, .h05, h6, .h06 {
-	font-family: "poppins-bold";
+	font-family: "lora-regular";
 	margin-bottom: 1.2rem;
 }
 h1, .h01 {
@@ -970,7 +970,8 @@ button::-moz-focus-inner, input::-moz-focus-inner {
 .skill-bars li .progress span {
 	position: absolute;
 	right: 0;
-	top: -3.6rem;
+	top: -5rem;
+	opacity: 40%;
 	display: block;
 	font-family: "poppins-regular", sans-serif;
 	color: white;
@@ -1119,7 +1120,7 @@ header .logo a {
 	color: transparent;
 	width: 53px;
 	height: 35px;
-	background: url("../images/ABLogo.png") no-repeat center;
+	background: url("../images/RitikaLogo.png") no-repeat center;
 	background-size: 52px 45px;
 }
 
@@ -1294,7 +1295,7 @@ header .logo a {
  * ------------------------------------------------------------------- 
  */
 #intro {
-	background: #151515 url(../images/nightsky.jpg) no-repeat center bottom;
+	background: #151515 url(../images/MainImage.png) no-repeat center bottom;
 	-webkit-background-size: cover;
 	-moz-background-size: cover;
 	background-size: cover;
@@ -2032,7 +2033,7 @@ header .logo a {
 	text-align: center;
 }
 #cta p.lead {
-	color: #6e6e6e;
+	color: black;
 }
 .cta-content {
 	max-width: 640px;
