@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project 03 - Zero-Dose Prediction Using ML</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/project-detail.css">
+</head>
+<body>
+<div class="page">
+  <header class="project-header">
+    <a class="back-link" href="../index.html#projects">Back to Projects</a>
+    <div class="hero-block">
+      <p class="kicker">Project 03 · Completed · Zero-Dose Risk Modelling</p>
+      <h1>Zero-Dose Prediction Using ML</h1>
+      <p class="lead">Region-wise NFHS-5 zero-dose risk modeling for children 12-23 months, combining L1 Logistic Regression and Neural Networks with class-1-focused thresholding and explainability.</p>
+      <div class="meta-row">
+        <span class="pill">NFHS-5 (12-23 months)</span>
+        <span class="pill">L1 Logistic + Neural Network</span>
+        <span class="pill">PR-Based Thresholding</span>
+        <span class="pill">Regional Models</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    <section class="card">
+      <h2>1) What We Did</h2>
+      <ul>
+        <li>Built zero-dose risk models using 10 predictors.</li>
+        <li>Trained Logistic Regression (L1, class-weighted) and Neural Network (focal loss + class weights).</li>
+        <li>Modeled regions separately: North, South, East, West, Northeast.</li>
+        <li>Used stratified splits and PR-curve thresholding for minority class.</li>
+        <li>Generated feature importance using LR coefficients, LOFO, and permutation analysis.</li>
+      </ul>
+      <h3>Operational Definition</h3>
+      <p>Zero-dose means no DTP-containing first dose (no-DTP1; IA2030-aligned proxy).</p>
+    </section>
+
+    <section class="card two-col">
+      <div>
+        <h2>2) Predictor Set</h2>
+        <div class="math">x_i = [Age, FemaleChild, Rural, state, BirthOrder, Deprived, FamilySize, NoAntenatalCare, UnassistedBirth, Maternal_Illiteracy]</div>
+        <p>Outcome:</p>
+        <div class="math">y_i = 1 if no-DTP1, else 0</div>
+      </div>
+      <div>
+        <h2>3) Class Prevalence by Region</h2>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Region</th>
+                <th>ZD=1 / Total</th>
+                <th>Prevalence</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>North</td><td>1015 / 14303</td><td>7.10%</td></tr>
+              <tr><td>South</td><td>268 / 5662</td><td>4.73%</td></tr>
+              <tr><td>East</td><td>515 / 10069</td><td>5.11%</td></tr>
+              <tr><td>West</td><td>463 / 6883</td><td>6.73%</td></tr>
+              <tr><td>Northeast</td><td>715 / 6134</td><td>11.66%</td></tr>
+              <tr><td>Overall</td><td>2976 / 43051</td><td>6.91%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="card two-col">
+      <div>
+        <h2>4) Logistic Baseline</h2>
+        <div class="math">p_i = sigma(w^T x_i + b)</div>
+        <div class="math">L_LR = -sum_i alpha_{y_i}[y_i log p_i + (1-y_i) log(1-p_i)] + lambda ||w||_1</div>
+        <p>with <code>class_weight='balanced'</code> (minority up-weighting).</p>
+      </div>
+      <div>
+        <h2>5) Neural Comparator</h2>
+        <div class="math">h^(1)=phi(W1x+b1), ..., p_i=sigma(w_o^T h^(L)+b_o)</div>
+        <p>Training uses focal-loss emphasis and class weights to prioritize hard minority examples.</p>
+        <div class="math">L_focal = -sum_i alpha_{y_i}(1-p_{t,i})^gamma log(p_{t,i})</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>6) Threshold Selection and Validation</h2>
+      <p>Threshold is chosen from training PR curve by maximizing F-beta objective, then applied to held-out tests.</p>
+      <div class="math">y_hat_i(tau)=1[p_i>=tau]</div>
+      <div class="math">F_beta(tau)=(1+beta^2) * Precision(tau) * Recall(tau) / (beta^2 * Precision(tau) + Recall(tau))</div>
+      <p>Implemented betas: LR about 2.0, NN about 1.85 (class-1 focus).</p>
+    </section>
+
+    <section class="card two-col">
+      <div>
+        <h2>7) Metrics Driving Model Choice</h2>
+        <div class="math">Accuracy = (TP+TN)/(TP+TN+FP+FN)</div>
+        <div class="math">Precision_1 = TP/(TP+FP)</div>
+        <div class="math">Recall_1 = TP/(TP+FN)</div>
+        <div class="math">F1_1 = 2*Precision_1*Recall_1/(Precision_1+Recall_1)</div>
+        <p>Primary emphasis: minority class precision-recall tradeoff, not plain accuracy.</p>
+      </div>
+      <div>
+        <h2>8) Explainability</h2>
+        <p>Global explainability:</p>
+        <ul>
+          <li>LR coefficient direction/magnitude.</li>
+          <li>LOFO importance.</li>
+          <li>Permutation importance.</li>
+        </ul>
+        <div class="math">Imp_j = E[M(f,X,y)-M(f,X_perm(j),y)]</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>9) Region-Specific Generalization and Practical Insights</h2>
+      <p>Separate regional models prevent a single pooled model from masking heterogeneity. Stable high-signal factors include Rural, Deprived, Maternal_Illiteracy, NoAntenatalCare, and UnassistedBirth.</p>
+      <p>Failure modes in low-support settings include threshold instability and precision loss due to low class-1 support.</p>
+    </section>
+
+    <section class="card two-col">
+      <div>
+        <h2>10) Current Gaps to Acknowledge</h2>
+        <ul>
+          <li>No full formal fairness audit yet (e.g., equal opportunity gaps across protected subgroups).</li>
+          <li>Need ongoing calibration and drift monitoring for repeated deployment.</li>
+        </ul>
+        <h3>Drift Monitoring</h3>
+        <p>Track prevalence drift, feature drift, PR/F1 drift, calibration drift, and subgroup gap drift.</p>
+      </div>
+      <div>
+        <h2>11) Intervention Workflow After High-Risk Flag</h2>
+        <ol>
+          <li>Generate district/block high-risk list.</li>
+          <li>ASHA/ANM verification (card + recall).</li>
+          <li>Household outreach and catch-up scheduling.</li>
+          <li>Reminder/defaulter follow-up.</li>
+          <li>Closure logging and feedback loop to model retraining.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>12) Why This is Operationally Useful</h2>
+      <p>The model identifies children who never entered the immunization pathway, allowing programs to prioritize first-contact outreach before schedule-completion interventions.</p>
+      <p class="note">Extension project: this work is expanded in <a href="insights-nn-national-vs-regional.html">Insights into NN Across National and Regional Immunisation Outcomes</a>.</p>
+    </section>
+  </main>
+
+  <p class="footer">Project Page · Ritika Singh · <a href="../index.html#projects">Return to portfolio</a></p>
+</div>
+</body>
+</html>

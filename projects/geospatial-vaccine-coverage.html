@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project 04 - Geo-Spatial Modelling of Vaccine Coverage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/project-detail.css">
+</head>
+<body>
+<div class="page">
+  <header class="project-header">
+    <a class="back-link" href="../index.html#projects">Back to Projects</a>
+    <div class="hero-block">
+      <p class="kicker">Project 04 · Completed · Geospatial Vaccine Modelling</p>
+      <h1>Geo-Spatial Modelling of Vaccine Coverage</h1>
+      <p class="lead">Cluster-level NFHS-4 and NFHS-5 Bayesian geospatial pipeline with INLA-SPDE and spGLM, including explicit maternal recall sensitivity (MR=0 vs MR=1), uncertainty mapping, and dropout-focused planning outputs.</p>
+      <div class="meta-row">
+        <span class="pill">NFHS-4 / NFHS-5</span>
+        <span class="pill">INLA-SPDE</span>
+        <span class="pill">spGLM</span>
+        <span class="pill">MR Sensitivity</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    <section class="card">
+      <h2>1) Project Recap</h2>
+      <p>This pipeline trains on DHS/NFHS cluster points and predicts onto raster grids to produce hyper-local coverage surfaces, uncertainty layers, dropout maps, and state-level evaluation summaries.</p>
+      <p>Primary modeling targets include BCG, DPT, and MCV dose outcomes across NFHS-4 (2015-2016) and NFHS-5 (2019-2021), with direct comparison between card-only and card+maternal-recall scenarios.</p>
+    </section>
+
+    <section class="card" id="mesh-lab">
+      <h2>2) Interactive Mesh and Sensitivity Lab</h2>
+      <p>Use this panel to interactively vary state, mesh granularity, model family, and maternal-recall regime. The mesh preview and metrics update in real time to show how uncertainty and fit move with each design choice.</p>
+      <p>The 0/1 vaccination point layer is generated from geolocated NFHS4 child records (cluster summary export in <code>data/cluster-vax-summary-nfhs4.json</code>).</p>
+      <p>State boundaries are loaded from real GeoJSON shape files in <code>data/india-states/</code>.</p>
+
+      <div class="lab-grid">
+        <div class="lab-controls">
+          <label class="lab-label">State
+            <select id="stateSelect">
+              <option value="Uttar Pradesh">Uttar Pradesh</option>
+              <option value="Bihar">Bihar</option>
+              <option value="Assam">Assam</option>
+              <option value="Maharashtra">Maharashtra</option>
+              <option value="Rajasthan">Rajasthan</option>
+              <option value="Nagaland">Nagaland</option>
+            </select>
+          </label>
+
+          <label class="lab-label">Model Family
+            <select id="modelSelect">
+              <option value="inla">INLA-SPDE</option>
+              <option value="spglm">spGLM</option>
+            </select>
+          </label>
+
+          <label class="lab-label">Data Source Regime
+            <select id="mrSelect">
+              <option value="mr1">Card + Maternal Recall (MR=1)</option>
+              <option value="mr0">Card Only (MR=0)</option>
+            </select>
+          </label>
+
+          <label class="lab-label">Vaccine (Actual 0/1 Layer)
+            <select id="vaccineSelect">
+              <option value="MCV1">MCV1</option>
+              <option value="BCG">BCG</option>
+              <option value="DPT3">DPT3</option>
+            </select>
+          </label>
+
+          <label class="lab-label">Mesh Resolution
+            <input id="meshRange" type="range" min="1" max="3" step="1" value="2">
+            <span class="range-meta" id="meshLabel">Medium</span>
+          </label>
+
+          <label class="lab-label">Mesh Offset
+            <input id="offsetRange" type="range" min="0" max="1" step="0.05" value="0.25">
+            <span class="range-meta" id="offsetLabel">0.25</span>
+          </label>
+
+          <label class="lab-label">Mesh Cutoff
+            <input id="cutoffRange" type="range" min="0.02" max="0.20" step="0.01" value="0.08">
+            <span class="range-meta" id="cutoffLabel">0.08</span>
+          </label>
+
+          <div class="lab-actions">
+            <button class="lab-btn" id="resetLab" type="button">Reset Scenario</button>
+          </div>
+        </div>
+
+        <div class="lab-visual">
+          <svg id="meshSvg" class="mesh-svg" viewBox="0 0 420 300" role="img" aria-label="Interactive geospatial mesh and cluster preview"></svg>
+          <p class="lab-caption" id="labCaption"></p>
+          <p class="lab-caption"><strong>Point legend:</strong> green = vaccinated=1 majority in cluster, red = vaccinated=0 majority. Radius scales with cluster sample size.</p>
+        </div>
+      </div>
+
+      <div class="metric-grid">
+        <div class="metric-card">
+          <p class="metric-label">Mesh Nodes (Est.)</p>
+          <p class="metric-value" id="nodesVal">-</p>
+          <p class="metric-delta" id="nodesDelta">-</p>
+        </div>
+        <div class="metric-card">
+          <p class="metric-label">Mean Edge (km)</p>
+          <p class="metric-value" id="edgeVal">-</p>
+          <p class="metric-delta" id="edgeDelta">-</p>
+        </div>
+        <div class="metric-card">
+          <p class="metric-label">Expected RMSE</p>
+          <p class="metric-value" id="rmseVal">-</p>
+          <p class="metric-delta" id="rmseDelta">-</p>
+        </div>
+        <div class="metric-card">
+          <p class="metric-label">Uncertainty Index U</p>
+          <p class="metric-value" id="uncVal">-</p>
+          <p class="metric-delta" id="uncDelta">-</p>
+        </div>
+        <div class="metric-card">
+          <p class="metric-label">Coldspot Stability</p>
+          <p class="metric-value" id="stabilityVal">-</p>
+          <p class="metric-delta" id="stabilityDelta">-</p>
+        </div>
+        <div class="metric-card">
+          <p class="metric-label">Expected PPC95</p>
+          <p class="metric-value" id="ppcVal">-</p>
+          <p class="metric-delta" id="ppcDelta">-</p>
+        </div>
+      </div>
+
+      <div class="cluster-grid">
+        <div class="metric-card">
+          <p class="metric-label">Clusters (Actual Data)</p>
+          <p class="metric-value" id="clusterCountVal">-</p>
+          <p class="metric-delta">NFHS4 geolocated clusters</p>
+        </div>
+        <div class="metric-card">
+          <p class="metric-label">Children (n)</p>
+          <p class="metric-value" id="childNVal">-</p>
+          <p class="metric-delta">Selected state + vaccine</p>
+        </div>
+        <div class="metric-card">
+          <p class="metric-label">Vaccinated = 1</p>
+          <p class="metric-value" id="oneVal">-</p>
+          <p class="metric-delta" id="oneShareVal">-</p>
+        </div>
+        <div class="metric-card">
+          <p class="metric-label">Vaccinated = 0</p>
+          <p class="metric-value" id="zeroVal">-</p>
+          <p class="metric-delta" id="zeroShareVal">-</p>
+        </div>
+        <div class="metric-card">
+          <p class="metric-label">Cluster Mean Coverage</p>
+          <p class="metric-value" id="clusterMeanVal">-</p>
+          <p class="metric-delta">Mean of cluster-level rates</p>
+        </div>
+      </div>
+
+      <div class="mini-chart">
+        <h3>Uncertainty by Mesh Resolution (Current State/Model/Regime)</h3>
+        <div class="bar-grid">
+          <div class="bar-row" id="rowSparse">
+            <span>Sparse</span>
+            <span class="bar-track"><span class="bar-fill" id="barSparse"></span></span>
+            <span id="barSparseVal">-</span>
+          </div>
+          <div class="bar-row" id="rowMedium">
+            <span>Medium</span>
+            <span class="bar-track"><span class="bar-fill" id="barMedium"></span></span>
+            <span id="barMediumVal">-</span>
+          </div>
+          <div class="bar-row" id="rowFine">
+            <span>Fine</span>
+            <span class="bar-track"><span class="bar-fill" id="barFine"></span></span>
+            <span id="barFineVal">-</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="variation-list">
+        <h3>What Varies and Why</h3>
+        <ul id="variationBullets"></ul>
+      </div>
+    </section>
+
+    <section class="card two-col">
+      <div>
+        <h2>3) Spatial Scale and Why It Works</h2>
+        <h3>Scale</h3>
+        <ul>
+          <li>Training: survey cluster coordinates.</li>
+          <li>Prediction: boundary-constrained raster grid.</li>
+          <li>Reporting: state-level aggregated summaries.</li>
+        </ul>
+        <h3>Signal vs Noise Tradeoff</h3>
+        <p>Cluster-level inputs preserve observed survey signal. Latent spatial smoothing regularizes sparse/noisy areas before rasterized outputs are exported for planning.</p>
+      </div>
+      <div>
+        <h2>4) Core Statistical Model</h2>
+        <p>For cluster <code>i</code>, vaccine outcome <code>v</code>, period <code>t</code>, maternal-recall regime <code>m in {0,1}</code>:</p>
+        <div class="math">y_{i,v,t}^{(m)} ~ Binomial(n_{i,v,t}, p_{i,v,t}^{(m)})</div>
+        <div class="math">logit(p_{i,v,t}^{(m)}) = x_i^T beta_{v,t,m} + w_{v,t,m}(s_i) + b_{state(i)} + b_{district(i)}</div>
+        <p>where <code>s_i = (lon_i, lat_i)</code> and <code>w(·)</code> is the latent spatial field.</p>
+      </div>
+    </section>
+
+    <section class="card two-col">
+      <div>
+        <h2>5) Spatial Dependence and Mesh Construction</h2>
+        <p>Adjacency is encoded through coordinate-driven mesh projection, not polygon-neighbor lists.</p>
+        <div class="math">M = (V, T),   V = mesh vertices, T = triangles</div>
+        <div class="math">A = A(loc, M)  (projection matrix from cluster/raster locations to mesh basis)</div>
+        <div class="math">w(s) approx sum_{k=1}^{K} psi_k(s) * omega_k</div>
+        <p>Raster multilevel labels are propagated through nearest-neighbor assignment for state/district factors.</p>
+      </div>
+      <div>
+        <h2>6) Matérn-SPDE Formulation</h2>
+        <div class="math">(kappa^2 - Delta)^(alpha/2) w(s) = W(s)</div>
+        <div class="math">omega ~ N(0, Q(kappa, tau)^{-1})</div>
+        <p>This produces a sparse Gaussian Markov random field representation compatible with INLA.</p>
+        <h3>Boundary/Sparse Handling</h3>
+        <ul>
+          <li>Mesh clipped to raster boundary polygon.</li>
+          <li><code>offset</code>, <code>cutoff</code>, and <code>max.edge</code> tuned for stable triangulation.</li>
+          <li>NA raster cells excluded from prediction domain.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>7) Covariates: Spatial vs Non-Spatial</h2>
+      <p><strong>Spatial component:</strong> latent field driven by longitude/latitude through SPDE mesh.</p>
+      <p><strong>Non-spatial component:</strong> cluster-aggregated socioeconomic and service-use predictors (wealth, education, access barriers, maternal-care proxies), with optional iid hierarchical effects for State/District/Region.</p>
+    </section>
+
+    <section class="card two-col">
+      <div>
+        <h2>8) Uncertainty Mapping</h2>
+        <p>Prediction exports include:</p>
+        <ul>
+          <li>posterior mean</li>
+          <li>standard deviation</li>
+          <li>2.5th and 97.5th posterior quantiles</li>
+          <li>relative uncertainty ratio</li>
+        </ul>
+        <div class="math">U_g = sd_g / mu_g</div>
+        <p>High <code>U_g</code> indicates unstable estimates requiring cautious interpretation.</p>
+      </div>
+      <div>
+        <h2>9) Diagnostics and Fit Comparison</h2>
+        <p>Current diagnostics include coverage/error/correlation summaries and CI checks; explicit residual Moran's I/variogram diagnostics are not yet fully automated in the committed pipeline.</p>
+        <div class="math">RMSE = sqrt((1/N) * sum_i (y_i - y_hat_i)^2)</div>
+        <div class="math">Corr = cor(y, y_hat)</div>
+        <div class="math">Coverage95 = (1/N) * sum_i 1[y_i in [q0.025_i, q0.975_i]]</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>10) Maternal Recall Sensitivity (MR=0 vs MR=1)</h2>
+      <p>The pipeline explicitly tests data-source sensitivity by toggling maternal recall inclusion. For MCV1, MR=1 improved fit and reduced uncertainty in both NFHS rounds:</p>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Survey</th>
+              <th>Metric</th>
+              <th>MR=0</th>
+              <th>MR=1</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>NFHS-4</td>
+              <td>RMSE</td>
+              <td>0.388</td>
+              <td>0.295</td>
+            </tr>
+            <tr>
+              <td>NFHS-4</td>
+              <td>Uncertainty</td>
+              <td>0.443</td>
+              <td>0.241</td>
+            </tr>
+            <tr>
+              <td>NFHS-5</td>
+              <td>RMSE</td>
+              <td>0.272</td>
+              <td>0.253</td>
+            </tr>
+            <tr>
+              <td>NFHS-5</td>
+              <td>Uncertainty</td>
+              <td>0.254</td>
+              <td>0.173</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>11) Persistent Coldspots Across Survey Rounds</h2>
+      <h3>MCV1 Persistent Low-Coverage States (MR=1)</h3>
+      <p>Arunachal Pradesh, Assam, Manipur, Meghalaya, Mizoram, Nagaland, Tripura, Uttar Pradesh.</p>
+      <h3>DPT3 Persistent Low-Coverage States (MR=1)</h3>
+      <p>Arunachal Pradesh, Assam, Meghalaya, Mizoram, Nagaland, Tripura, Uttar Pradesh.</p>
+      <p class="note">These persistent patterns are useful for continuity-focused policy planning across survey waves.</p>
+    </section>
+
+    <section class="card two-col">
+      <div>
+        <h2>12) Current Gaps and Risk Sources</h2>
+        <ul>
+          <li>No fully automated prior-sensitivity sweep in the current committed workflow.</li>
+          <li>No full posterior variance-partition report for spatial-effect share yet.</li>
+          <li>Largest data-quality risk: cluster geolocation uncertainty and key harmonization mismatch.</li>
+        </ul>
+      </div>
+      <div>
+        <h2>13) Planning Integration and First-Use Map</h2>
+        <p>Pipeline already exports planning-ready raster/TIFF products: coverage, uncertainty, missed-cluster and error maps.</p>
+        <p><strong>First map to use:</strong> DPT1 to DPT3 dropout probability map under MR=1, with uncertainty overlay. This is operationally high-value because it isolates service-continuity failure after first contact.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>14) One-Sentence Policy Contribution</h2>
+      <p class="note">The project provides uncertainty-aware, cluster-to-grid geospatial estimates that distinguish stable versus unstable low-coverage pockets, enabling state programs to prioritize continuity gaps and maternal-recall-sensitive hotspots with greater confidence.</p>
+    </section>
+  </main>
+
+  <p class="footer">Project Page · Ritika Singh · <a href="../index.html#projects">Return to portfolio</a></p>
+</div>
+<script src="../js/geospatial-lab.js"></script>
+</body>
+</html>

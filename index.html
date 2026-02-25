@@ -28,6 +28,11 @@
   .nav-links { display: flex; gap: 2rem; list-style: none; align-items: center; }
   .nav-links a { font-family: 'DM Mono', monospace; font-size: 0.75rem; letter-spacing: 0.08em; text-decoration: none; color: var(--muted); text-transform: uppercase; transition: color 0.2s; }
   .nav-links a:hover { color: var(--accent); }
+  .nav-links a.active { color: var(--accent); }
+  .nav-toggle { display: none; width: 40px; height: 40px; border: 1px solid var(--line); background: rgba(255,255,255,0.65); align-items: center; justify-content: center; gap: 4px; flex-direction: column; cursor: pointer; }
+  .nav-toggle span { width: 16px; height: 1.5px; background: var(--ink); transition: transform 0.2s, opacity 0.2s; }
+  nav.nav-open .nav-toggle span:first-child { transform: translateY(2.75px) rotate(45deg); }
+  nav.nav-open .nav-toggle span:last-child { transform: translateY(-2.75px) rotate(-45deg); }
   .nav-cv-btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1.1rem; background: var(--accent); color: #fff !important; font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; transition: background 0.2s, transform 0.2s; }
   .nav-cv-btn:hover { background: var(--ink) !important; transform: translateY(-1px); }
 
@@ -56,6 +61,18 @@
   .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--accent); }
   .stat-number { font-family: 'DM Serif Display', serif; font-size: 2.25rem; line-height: 1; margin-bottom: 0.25rem; }
   .stat-label { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+
+  #documents { padding: 0 4rem 5rem; }
+  .docs-panel { border: 1px solid var(--line); background: linear-gradient(135deg, rgba(255,255,255,0.78), rgba(255,255,255,0.48)); padding: 2rem; display: grid; grid-template-columns: 1.1fr 1.9fr; gap: 2rem; align-items: center; }
+  .docs-kicker { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.8rem; }
+  .docs-title { font-family: 'DM Serif Display', serif; font-size: clamp(1.7rem, 3vw, 2.4rem); letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 0.6rem; }
+  .docs-copy { color: var(--muted); max-width: 36ch; font-size: 0.94rem; line-height: 1.7; }
+  .docs-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+  .doc-card { border: 1px solid var(--line); background: var(--paper); padding: 1.2rem 1.25rem; text-decoration: none; color: var(--ink); transition: transform 0.2s, border-color 0.2s, background 0.2s; }
+  .doc-card:hover { transform: translateY(-3px); border-color: var(--accent); background: #fff; }
+  .doc-label { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.11em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.45rem; }
+  .doc-name { font-family: 'Instrument Sans', sans-serif; font-weight: 600; font-size: 1rem; line-height: 1.35; margin-bottom: 0.5rem; }
+  .doc-meta { font-family: 'DM Mono', monospace; font-size: 0.66rem; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; }
 
   section { padding: 6rem 4rem; }
   .section-header { display: flex; align-items: baseline; gap: 1.5rem; margin-bottom: 4rem; border-bottom: 1px solid var(--line); padding-bottom: 1.5rem; }
@@ -86,8 +103,9 @@
   .pub-type { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); writing-mode: vertical-rl; transform: rotate(180deg); }
 
   #projects { background: #f8f4ec; }
-  .projects-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5px; background: var(--line); }
-  .project-card { background: var(--paper); padding: 2.5rem; position: relative; overflow: hidden; transition: background 0.3s; cursor: pointer; }
+  .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5px; background: var(--line); }
+  .projects-intro { margin: -2.4rem 0 1.7rem; color: var(--muted); font-size: 0.94rem; max-width: 62ch; }
+  .project-card { display: block; background: var(--paper); padding: 2.5rem; position: relative; overflow: hidden; transition: background 0.3s; cursor: pointer; text-decoration: none; color: var(--ink); min-height: 100%; }
   .project-card:hover { background: #fff; }
   .project-card::before { content: attr(data-num); position: absolute; top: 1.5rem; right: 2rem; font-family: 'DM Serif Display', serif; font-size: 4rem; color: rgba(13,13,13,0.05); line-height: 1; transition: color 0.3s; }
   .project-card:hover::before { color: rgba(200,82,42,0.07); }
@@ -96,6 +114,7 @@
   .project-card p { font-size: 0.9rem; color: var(--muted); line-height: 1.7; margin-bottom: 1.5rem; }
   .project-techs { display: flex; flex-wrap: wrap; gap: 0.5rem; }
   .tech-tag { font-family: 'DM Mono', monospace; font-size: 0.65rem; padding: 0.2rem 0.6rem; border: 1px solid var(--line); color: var(--muted); letter-spacing: 0.05em; }
+  .project-read { margin-top: 1.35rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--accent); display: inline-flex; align-items: center; gap: 0.35rem; }
 
   .timeline { position: relative; padding-left: 2rem; }
   .timeline::before { content: ''; position: absolute; left: 0; top: 0.5rem; bottom: 0; width: 1px; background: var(--line); }
@@ -161,13 +180,18 @@
 
   .cursor-grow #cursor { width: 24px; height: 24px; background: rgba(200,82,42,0.3); }
   .cursor-grow #cursor-ring { width: 8px; height: 8px; }
-  a, button, .project-card, .award-card, .skill-item, .cert-card { cursor: none; }
+  a, button, .project-card, .award-card, .skill-item, .cert-card, .doc-card { cursor: none; }
 
   @media (max-width: 900px) {
-    nav { padding: 1rem 1.5rem; }
-    .nav-links { gap: 1rem; flex-wrap: wrap; }
+    nav { padding: 1rem 1.5rem; flex-wrap: wrap; align-items: center; gap: 0.75rem; }
+    .nav-toggle { display: inline-flex; margin-left: auto; }
+    .nav-links { display: none; width: 100%; gap: 0.9rem; flex-direction: column; align-items: flex-start; border-top: 1px solid var(--line); padding-top: 0.9rem; margin-top: 0.15rem; }
+    nav.nav-open .nav-links { display: flex; }
     #hero { grid-template-columns: 1fr; padding: 6rem 1.5rem 3rem; }
     .hero-right { align-items: flex-start; }
+    #documents { padding: 0 1.5rem 3rem; }
+    .docs-panel { grid-template-columns: 1fr; padding: 1.25rem; }
+    .docs-grid { grid-template-columns: 1fr; }
     section { padding: 4rem 1.5rem; }
     .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
     .projects-grid { grid-template-columns: 1fr; }
@@ -179,6 +203,13 @@
     .stat-card:nth-child(2), .stat-card:nth-child(3) { margin-right: 0; }
     #cv-download { flex-direction: column; text-align: center; padding: 3rem 1.5rem; }
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    #cursor, #cursor-ring { display: none !important; }
+    body, a, button, .project-card, .award-card, .skill-item, .cert-card, .doc-card { cursor: auto !important; }
+  }
 </style>
 </head>
 <body>
@@ -188,15 +219,20 @@
 
 <nav>
   <div class="nav-logo">Ritika Singh</div>
-  <ul class="nav-links">
+  <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Toggle navigation">
+    <span></span>
+    <span></span>
+  </button>
+  <ul class="nav-links" id="main-nav">
     <li><a href="#about">About</a></li>
+    <li><a href="#documents">Documents</a></li>
     <li><a href="#publications">Research</a></li>
     <li><a href="#projects">Projects</a></li>
     <li><a href="#certificates">Certificates</a></li>
     <li><a href="#experience">Experience</a></li>
     <li><a href="#contact">Contact</a></li>
     <li>
-      <a href="Documents/RitikaSinghResume.pdf" download class="nav-cv-btn">
+      <a href="Documents/CV.pdf" download class="nav-cv-btn">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         CV
       </a>
@@ -211,11 +247,11 @@
     <p class="hero-desc">I build probabilistic models that reveal the hidden processes behind health inequalities — turning noisy, incomplete data into interpretable insights that matter.</p>
     <div class="hero-cta">
       <a href="#publications" class="btn-primary">View Research →</a>
-      <a href="Documents/RitikaSinghResume.pdf" download class="btn-secondary">
+      <a href="Documents/CV.pdf" download class="btn-secondary">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Download CV
       </a>
-      <a href="mailto:ritika291195@icloud.com" class="btn-accent">Get in Touch</a>
+      <a href="Documents/ResearchSoFar.pdf" target="_blank" rel="noopener noreferrer" class="btn-accent">Research Snapshot</a>
     </div>
   </div>
   <div class="hero-right">
@@ -225,6 +261,28 @@
     <div class="stat-card"><div class="stat-number">LMIC</div><div class="stat-label">Research Focus</div></div>
   </div>
   <div class="hero-bg-text">RS</div>
+</section>
+
+<section id="documents" class="reveal">
+  <div class="docs-panel">
+    <div>
+      <p class="docs-kicker">Documents</p>
+      <h2 class="docs-title">CV and Research Summary</h2>
+      <p class="docs-copy">Public versions of my current CV and research summary are available below.</p>
+    </div>
+    <div class="docs-grid">
+      <a href="Documents/CV.pdf" download class="doc-card">
+        <p class="doc-label">Updated CV</p>
+        <p class="doc-name">Curriculum Vitae (PDF)</p>
+        <p class="doc-meta">Updated January 2026</p>
+      </a>
+      <a href="Documents/ResearchSoFar.pdf" target="_blank" rel="noopener noreferrer" class="doc-card">
+        <p class="doc-label">Research Summary</p>
+        <p class="doc-name">Research So Far (PDF)</p>
+        <p class="doc-meta">Updated February 2026</p>
+      </a>
+    </div>
+  </div>
 </section>
 
 <section id="about">
@@ -259,7 +317,7 @@
         <h3>Bridging the Immunization Gap: Predictive Models for Zero-Dose and Vaccination Dropout in India</h3>
         <div class="pub-meta">Ritika Singh, Mira Johri, Sumeet Agarwal</div>
         <span class="pub-venue">ACM COMPASS 2025</span>
-        <a href="https://dl.acm.org/doi/proceedings/10.1145/3689904" target="_blank" class="pub-link">ACM ↗</a>
+        <a href="https://dl.acm.org/doi/proceedings/10.1145/3689904" target="_blank" rel="noopener noreferrer" class="pub-link">ACM ↗</a>
         <a href="mailto:ritika291195@icloud.com?subject=Request%20Paper%20PDF%20-%20Bridging%20the%20Immunization%20Gap" class="pub-link">Request PDF ↗</a>
       </div>
       <div class="pub-type">Full Paper</div>
@@ -271,7 +329,7 @@
         <h3>Quantifying the Role of Maternal Recall in Estimates of Routine Immunisation Rates in India: A Large-Scale Sub-National Bayesian Modelling Study</h3>
         <div class="pub-meta">Ritika Singh, Alexandre de Figueiredo, Sumeet Agarwal, Misha Mishra, Devyani Agarwal</div>
         <span class="pub-venue">ACM COMPASS 2024</span>
-        <a href="https://dl.acm.org/doi/proceedings/10.1145/3674399" target="_blank" class="pub-link">ACM ↗</a>
+        <a href="https://dl.acm.org/doi/proceedings/10.1145/3674399" target="_blank" rel="noopener noreferrer" class="pub-link">ACM ↗</a>
         <a href="mailto:ritika291195@icloud.com?subject=Request%20Paper%20PDF%20-%20Quantifying%20Maternal%20Recall" class="pub-link">Request PDF ↗</a>
       </div>
       <div class="pub-type">Full Paper</div>
@@ -293,7 +351,7 @@
         <h3>Exploring Multimorbidity and Patterns of Long-Term Conditions in England Using Open Prescription and Primary Care Data</h3>
         <div class="pub-meta">Ritika Singh, Data Study Group Team</div>
         <span class="pub-venue">The Alan Turing Institute</span>
-        <a href="https://www.turing.ac.uk/research/publications" target="_blank" class="pub-link">Report ↗</a>
+        <a href="https://www.turing.ac.uk/research/publications" target="_blank" rel="noopener noreferrer" class="pub-link">Report ↗</a>
       </div>
       <div class="pub-type">Data Study</div>
     </div>
@@ -304,8 +362,8 @@
         <h3>M.Tech Thesis</h3>
         <div class="pub-meta">Ritika Singh · JIIT Noida</div>
         <span class="pub-venue">Master's Thesis · Data Analytics</span>
-        <a href="Documents/Publications/MtechThesis.pdf" target="_blank" class="pub-link">PDF ↗</a>
-        <a href="Documents/MtechThesis.pdf" target="_blank" class="pub-link" style="display:none"></a>
+        <a href="Documents/Publications/MtechThesis.pdf" target="_blank" rel="noopener noreferrer" class="pub-link">PDF ↗</a>
+        <a href="Documents/MtechThesis.pdf" target="_blank" rel="noopener noreferrer" class="pub-link" style="display:none"></a>
       </div>
       <div class="pub-type">Thesis</div>
     </div>
@@ -315,31 +373,43 @@
 
 <section id="projects">
   <div class="section-header"><span class="section-num">03 —</span><h2>Projects</h2></div>
+  <p class="projects-intro">Five projects are listed below. Each card opens a dedicated page with explicit details on problem statement, motivation, logic, modeling, and mathematical approach.</p>
   <div class="projects-grid">
-    <div class="project-card reveal" data-num="01">
+    <a class="project-card reveal" data-num="01" href="projects/immunisation-attitudes.html">
       <div class="project-tag">Ongoing · Immunisation</div>
       <h3>Understanding Inference in Immunisation Attitudes</h3>
       <p>Multi-country study on how socioeconomic factors shape vaccine trust and behavior. Latent variable models decompose demand from access barriers across diverse national contexts.</p>
       <div class="project-techs"><span class="tech-tag">IRT Models</span><span class="tech-tag">Hierarchical Bayesian</span><span class="tech-tag">R / Stan</span><span class="tech-tag">Survey Analysis</span></div>
-    </div>
-    <div class="project-card reveal" data-num="02">
+      <span class="project-read">Open full case study -></span>
+    </a>
+    <a class="project-card reveal" data-num="02" href="projects/early-childhood-up.html">
       <div class="project-tag">Completed · ECD</div>
       <h3>Early Childhood Development in Rural Uttar Pradesh</h3>
       <p>ML models identifying determinants of developmental variation in rural India, including active participation in contextual adaptation of ECDI survey instruments for village settings.</p>
       <div class="project-techs"><span class="tech-tag">Random Forest</span><span class="tech-tag">XGBoost</span><span class="tech-tag">Construct Validity</span><span class="tech-tag">Python</span></div>
-    </div>
-    <div class="project-card reveal" data-num="03">
+      <span class="project-read">Open full case study -></span>
+    </a>
+    <a class="project-card reveal" data-num="03" href="projects/zero-dose-ml.html">
       <div class="project-tag">Completed · Immunisation</div>
       <h3>Zero-Dose Prediction Using ML</h3>
       <p>Predictive models for early identification of zero-dose children across the immunisation cascade, explicitly separating model performance from substantive interpretation.</p>
       <div class="project-techs"><span class="tech-tag">Cascade Analysis</span><span class="tech-tag">SHAP</span><span class="tech-tag">Region-Specific Models</span><span class="tech-tag">Python</span></div>
-    </div>
-    <div class="project-card reveal" data-num="04">
+      <span class="project-read">Open full case study -></span>
+    </a>
+    <a class="project-card reveal" data-num="04" href="projects/geospatial-vaccine-coverage.html">
       <div class="project-tag">Completed · Spatial</div>
       <h3>Geo-Spatial Modelling of Vaccine Coverage</h3>
       <p>Sub-national Bayesian spatial analysis identifying vaccination coldspots in India using SPDE via INLA, modeling spatial dependence, regional heterogeneity, and measurement uncertainty.</p>
       <div class="project-techs"><span class="tech-tag">INLA / SPDE</span><span class="tech-tag">spGLM</span><span class="tech-tag">qGIS</span><span class="tech-tag">R</span></div>
-    </div>
+      <span class="project-read">Open full case study -></span>
+    </a>
+    <a class="project-card reveal" data-num="05" href="projects/insights-nn-national-vs-regional.html">
+      <div class="project-tag">Extension · Zero-Dose Pipeline</div>
+      <h3>Insights into NN Across National and Regional Immunisation Outcomes</h3>
+      <p>Extension of Zero-Dose modeling into a fresh retraining framework for ZD, MCV dropout, and DPT dropout with explicit national-vs-regional NN behavior, LR comparison, and deep interpretability analysis.</p>
+      <div class="project-techs"><span class="tech-tag">MLP / LR</span><span class="tech-tag">Threshold Tuning</span><span class="tech-tag">Permutation AP-Drop</span><span class="tech-tag">Cross-Outcome Visuals</span></div>
+      <span class="project-read">Open full case study -></span>
+    </a>
   </div>
 </section>
 
@@ -429,65 +499,65 @@
   <div class="section-header"><span class="section-num">06 —</span><h2>Certificates &amp; Credentials</h2></div>
   <p class="certs-intro">Professional certifications, training programmes, and credentials earned alongside doctoral research. Click any card to open the certificate.</p>
   <div class="certs-grid">
-    <a href="Certificates/Data Science.pdf" class="cert-card reveal" target="_blank">
+    <a href="Certificates/Data Science.pdf" class="cert-card reveal" target="_blank" rel="noopener noreferrer">
       <div class="cert-icon">📊</div>
       <div class="cert-name">Data Science</div>
       <div class="cert-meta">Certificate of Completion</div>
     </a>
-    <a href="Certificates/Machine Learning A-Z.pdf" class="cert-card reveal" target="_blank">
+    <a href="Certificates/Machine Learning A-Z.pdf" class="cert-card reveal" target="_blank" rel="noopener noreferrer">
       <div class="cert-icon">🤖</div>
       <div class="cert-name">Machine Learning A–Z</div>
       <div class="cert-meta">Certificate of Completion</div>
     </a>
-    <a href="Certificates/Deep Learning.pdf" class="cert-card reveal" target="_blank">
+    <a href="Certificates/Deep Learning.pdf" class="cert-card reveal" target="_blank" rel="noopener noreferrer">
       <div class="cert-icon">🧠</div>
       <div class="cert-name">Deep Learning</div>
       <div class="cert-meta">Certificate of Completion</div>
     </a>
-    <a href="Certificates/ComputerVision.pdf" class="cert-card reveal" target="_blank">
+    <a href="Certificates/ComputerVision.pdf" class="cert-card reveal" target="_blank" rel="noopener noreferrer">
       <div class="cert-icon">👁️</div>
       <div class="cert-name">Computer Vision</div>
       <div class="cert-meta">Certificate of Completion</div>
     </a>
-    <a href="Certificates/Complete Guide to TensorFlow.pdf" class="cert-card reveal" target="_blank">
+    <a href="Certificates/Complete Guide to TensorFlow.pdf" class="cert-card reveal" target="_blank" rel="noopener noreferrer">
       <div class="cert-icon">🔬</div>
       <div class="cert-name">Complete Guide to TensorFlow</div>
       <div class="cert-meta">Certificate of Completion</div>
     </a>
-    <a href="Certificates/2022 Complete Python Bootcamp .pdf" class="cert-card reveal" target="_blank">
+    <a href="Certificates/2022 Complete Python Bootcamp .pdf" class="cert-card reveal" target="_blank" rel="noopener noreferrer">
       <div class="cert-icon">🐍</div>
       <div class="cert-name">Complete Python Bootcamp 2022</div>
       <div class="cert-meta">Certificate of Completion</div>
     </a>
-    <a href="Certificates/Python.pdf" class="cert-card reveal" target="_blank">
+    <a href="Certificates/Python.pdf" class="cert-card reveal" target="_blank" rel="noopener noreferrer">
       <div class="cert-icon">💻</div>
       <div class="cert-name">Python Programming</div>
       <div class="cert-meta">Certificate of Completion</div>
     </a>
-    <a href="Certificates/Tableau.pdf" class="cert-card reveal" target="_blank">
+    <a href="Certificates/Tableau.pdf" class="cert-card reveal" target="_blank" rel="noopener noreferrer">
       <div class="cert-icon">📈</div>
       <div class="cert-name">Tableau</div>
       <div class="cert-meta">Certificate of Completion</div>
     </a>
-    <a href="Certificates/scrapy.pdf" class="cert-card reveal" target="_blank">
+    <a href="Certificates/scrapy.pdf" class="cert-card reveal" target="_blank" rel="noopener noreferrer">
       <div class="cert-icon">🕷️</div>
       <div class="cert-name">Scrapy — Web Scraping</div>
       <div class="cert-meta">Certificate of Completion</div>
     </a>
-    <a href="Certificates/Data Science Cybersecuity Implementation.pdf" class="cert-card reveal" target="_blank">
+    <a href="Certificates/Data Science Cybersecuity Implementation.pdf" class="cert-card reveal" target="_blank" rel="noopener noreferrer">
       <div class="cert-icon">🔐</div>
       <div class="cert-name">Data Science &amp; Cybersecurity Implementation</div>
       <div class="cert-meta">Certificate of Completion</div>
     </a>
-    <a href="Certificates/SAP.pdf" class="cert-card reveal" target="_blank">
+    <a href="Certificates/SAP.pdf" class="cert-card reveal" target="_blank" rel="noopener noreferrer">
       <div class="cert-icon">🏢</div>
       <div class="cert-name">SAP</div>
       <div class="cert-meta">Certificate of Completion</div>
     </a>
-    <a href="Documents/RitikaSinghResume.pdf" class="cert-card reveal" target="_blank">
+    <a href="Documents/CV.pdf" class="cert-card reveal" target="_blank" rel="noopener noreferrer">
       <div class="cert-icon">📄</div>
       <div class="cert-name">Full Curriculum Vitae</div>
-      <div class="cert-meta">Updated 2025 · PDF</div>
+      <div class="cert-meta">Updated 2026 · PDF</div>
     </a>
   </div>
 </section>
@@ -499,11 +569,11 @@
     <p>Download my complete CV — publications, projects, teaching, and more.</p>
   </div>
   <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;">
-    <a href="Documents/RitikaSinghResume.pdf" download class="cv-download-btn">
+    <a href="Documents/CV.pdf" download class="cv-download-btn">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Download CV (PDF)
     </a>
-    <a href="mailto:ritika291195@icloud.com?subject=Research%20Statement%20Request" class="cv-download-btn" style="background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,0.5);">
+    <a href="Documents/ResearchSoFar.pdf" target="_blank" rel="noopener noreferrer" class="cv-download-btn" style="background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,0.5);">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
       Research Statement
     </a>
@@ -543,31 +613,31 @@
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>
       ritika291195@icloud.com
     </a>
-    <a href="https://www.linkedin.com/in/ritika-singh-90ba66114/" target="_blank" class="contact-link">
+    <a href="https://www.linkedin.com/in/ritika-singh-90ba66114/" target="_blank" rel="noopener noreferrer" class="contact-link">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
       LinkedIn
     </a>
-    <a href="https://github.com/ritikasingh95" target="_blank" class="contact-link">
+    <a href="https://github.com/ritikasingh95" target="_blank" rel="noopener noreferrer" class="contact-link">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
       GitHub
     </a>
-    <a href="Documents/RitikaSinghResume.pdf" download class="contact-link">
+    <a href="Documents/CV.pdf" download class="contact-link">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Download CV
     </a>
-    <a href="mailto:ritika291195@icloud.com?subject=Research%20Statement%20Request" class="contact-link">
+    <a href="Documents/ResearchSoFar.pdf" target="_blank" rel="noopener noreferrer" class="contact-link">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-      Request Research Statement
+      Research Statement
     </a>
   </div>
 </section>
 
 <footer>
-  <p>© 2025 Ritika Singh · Ph.D. Candidate, IIT Delhi · <a href="https://github.com/ritikasingh95/ritikasingh95.github.io">ritikasingh95.github.io</a></p>
+  <p>© 2026 Ritika Singh · Ph.D. Candidate, IIT Delhi · <a href="https://github.com/ritikasingh95/ritikasingh95.github.io">ritikasingh95.github.io</a></p>
 </footer>
 
 <script>
-  const interactiveSelector = 'a, button, .project-card, .award-card, .skill-item, .cert-card';
+  const interactiveSelector = 'a, button, .project-card, .award-card, .skill-item, .cert-card, .doc-card, .nav-toggle';
   const cursor = document.getElementById('cursor');
   const cursorRing = document.getElementById('cursor-ring');
   const isFinePointer = window.matchMedia('(pointer: fine)').matches;
@@ -633,6 +703,46 @@
     item.style.transitionDelay = `${Math.min(index * 0.08, 0.4)}s`;
     pubObserver.observe(item);
   });
+
+  const nav = document.querySelector('nav');
+  const navToggle = document.querySelector('.nav-toggle');
+  const sectionLinks = Array.from(document.querySelectorAll('.nav-links a[href^="#"]'));
+  const linkedSections = sectionLinks
+    .map((link) => document.querySelector(link.getAttribute('href')))
+    .filter(Boolean);
+
+  if (nav && navToggle) {
+    navToggle.addEventListener('click', () => {
+      const open = nav.classList.toggle('nav-open');
+      navToggle.setAttribute('aria-expanded', String(open));
+    });
+
+    sectionLinks.forEach((link) => {
+      link.addEventListener('click', () => {
+        if (window.matchMedia('(max-width: 900px)').matches) {
+          nav.classList.remove('nav-open');
+          navToggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+    });
+  }
+
+  const highlightCurrentSection = () => {
+    const checkpoint = window.innerHeight * 0.3;
+    let activeId = '';
+    linkedSections.forEach((section) => {
+      const rect = section.getBoundingClientRect();
+      if (rect.top <= checkpoint && rect.bottom >= checkpoint) {
+        activeId = section.id;
+      }
+    });
+    sectionLinks.forEach((link) => {
+      link.classList.toggle('active', link.getAttribute('href') === `#${activeId}`);
+    });
+  };
+
+  highlightCurrentSection();
+  document.addEventListener('scroll', highlightCurrentSection, { passive: true });
 
   document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
     anchor.addEventListener('click', (event) => {

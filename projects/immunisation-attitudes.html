@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project 01 - DHS Access-Demand Decomposition for Immunisation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/project-detail.css">
+</head>
+<body>
+<div class="page">
+  <header class="project-header">
+    <a class="back-link" href="../index.html#projects">Back to Projects</a>
+    <div class="hero-block">
+      <p class="kicker">Project 01 · Ongoing · DHS Pipeline</p>
+      <h1>Understanding Inference in Immunisation Attitudes</h1>
+      <p class="lead">Current DHS pipeline: <strong>MHAQI-informed access</strong> plus <strong>demand conditional on access</strong>, estimated in a hierarchical framework to prioritize region-specific policy action.</p>
+      <div class="meta-row">
+        <span class="pill">MHAQI Access Model</span>
+        <span class="pill">Access/Demand Decomposition</span>
+        <span class="pill">Hierarchical Bayesian</span>
+        <span class="pill">Uncertainty-Aware Targeting</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    <section class="card">
+      <h2>1) Decision Objective</h2>
+      <p>Primary policy decision: determine which regions need <strong>demand-generation</strong> interventions versus <strong>service-delivery/access</strong> interventions first, to improve full immunisation fastest.</p>
+      <h3>Unit of Analysis</h3>
+      <p>Child-level outcome modeling with mother/household covariates and region-level hierarchical effects.</p>
+    </section>
+
+    <section class="card two-col">
+      <div>
+        <h2>2) Latent Structure (Current Core)</h2>
+        <ul>
+          <li><strong>Access</strong>: latent/partially latent dimension informed by MHAQI-style barriers.</li>
+          <li><strong>Demand</strong>: modeled conditional on access and uptake behavior.</li>
+          <li><strong>Trust/service reliability</strong>: proxied in current core, not explicitly separate latent factors.</li>
+        </ul>
+      </div>
+      <div>
+        <h2>3) Indicator Mapping</h2>
+        <p>Access-side indicators include permission, money, distance, accompaniment, ANC/delivery proxies, wealth, and residence.</p>
+        <p>Outcome side uses dose indicators:</p>
+        <div class="math">y_{i,d} in {imm_bcg, ..., imm_mcv1}</div>
+        <p>interpreted as uptake behavior conditional on schedule eligibility and access.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>4) Missingness and Eligibility Handling</h2>
+      <p>Dose values are set to missing for ineligible ages (schedule-based masking). For child <code>i</code> and dose <code>d</code>:</p>
+      <div class="math">e_{i,d} = 1[age_i >= a_d^*],   y_{i,d} = NA if e_{i,d} = 0</div>
+      <p>Downstream predictor steps use model defaults and complete-case behavior where required.</p>
+    </section>
+
+    <section class="card two-col">
+      <div>
+        <h2>5) Access Model</h2>
+        <p>Let <code>A_i</code> denote access propensity (or access probability scale):</p>
+        <div class="math">logit(P(A_i = 1)) = alpha_0 + alpha^T x_i + u_{r(i)}</div>
+        <div class="math">u_r ~ N(0, sigma_A^2)</div>
+        <p>with <code>x_i</code> including MHAQI-related constraints and sociodemographic covariates.</p>
+      </div>
+      <div>
+        <h2>6) Demand Model (Conditional on Access)</h2>
+        <p>For each dose <code>d</code>:</p>
+        <div class="math">logit(P(D_{i,d}=1 | A_i=1)) = beta_{0,d} + beta_d^T x_i + v_{r(i),d}</div>
+        <div class="math">v_{r,d} ~ N(0, sigma_d^2)</div>
+        <p><code>D_{i,d}</code> captures demand-side uptake probability once access is available.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>7) Access/Demand Decomposition</h2>
+      <p>Observed dose-uptake probability is decomposed as:</p>
+      <div class="math">P(y_{i,d}=1) = e_{i,d} * P(A_i=1) * P(D_{i,d}=1 | A_i=1)</div>
+      <p>Observed full-immunisation probability for eligible schedule <code>S_i</code>:</p>
+      <div class="math">P_i^{obs} = prod_{d in S_i} P(y_{i,d}=1)</div>
+      <p>Counterfactual full-access probability:</p>
+      <div class="math">P_i^{cf-access} = prod_{d in S_i} P(D_{i,d}=1 | A_i=1)</div>
+      <p>Region-level access gap:</p>
+      <div class="math">Gap_r^{access} = E_i[P_i^{cf-access} - P_i^{obs} | r(i)=r]</div>
+      <p>Demand shortfall under full access:</p>
+      <div class="math">Gap_r^{demand} = 1 - E_i[P_i^{cf-access} | r(i)=r]</div>
+    </section>
+
+    <section class="card">
+      <h2>8) Identifiability and Priors</h2>
+      <p>Identifiability is maintained through latent scale constraints and fixed model structure (dose ordering plus hierarchical pooling).</p>
+      <ul>
+        <li>Standardized latent dimensions.</li>
+        <li>Monotone dose/schedule logic constraints.</li>
+        <li>Domain-driven constraints for age and schedule plausibility.</li>
+        <li>Weakly informative priors for generic regression/random-effect components.</li>
+      </ul>
+    </section>
+
+    <section class="card two-col">
+      <div>
+        <h2>9) Validation and Robustness</h2>
+        <p>Strongest model check:</p>
+        <div class="math">PPC dose calibration by region + dropout-pattern PPC</div>
+        <p>Posterior predictive discrepancy form:</p>
+        <div class="math">D = sum_{r,d} (y_bar_{r,d} - y_hat_{r,d})^2</div>
+      </div>
+      <div>
+        <h2>10) Sensitivity Strategy</h2>
+        <ul>
+          <li>Threshold sweeps: 10 / 50 / 80 / 90 / 99.</li>
+          <li>Alternate model specifications (M1-M4).</li>
+          <li>Alternate latent item sets and prior choices.</li>
+          <li>Consistency via LOO + PPC agreement.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>11) Biases, Uncertainty, and Interpretation Guardrails</h2>
+      <h3>Known Bias Sources</h3>
+      <ul>
+        <li>Vaccination measurement error (card vs recall).</li>
+        <li>Selection/survivorship effects.</li>
+        <li>Age-reporting noise.</li>
+      </ul>
+      <h3>Uncertainty Communication</h3>
+      <ul>
+        <li>95% credible intervals.</li>
+        <li>Probabilistic rankings.</li>
+        <li>Map overlays highlighting overlap/instability, not only point estimates.</li>
+      </ul>
+      <h3>Wrong-but-Plausible Interpretation to Avoid</h3>
+      <p>"Low coverage implies low parental demand" can be false when access/service constraints are dominant.</p>
+    </section>
+
+    <section class="card">
+      <h2>12) Most Important Heterogeneity and Core Contribution</h2>
+      <p>Most important subgroup heterogeneity dimensions: <strong>region</strong>, <strong>wealth/SES</strong>, <strong>urban-rural</strong>, and <strong>maternal education</strong>.</p>
+      <p class="note"><strong>One-sentence contribution:</strong> The project provides a hierarchical, uncertainty-aware decomposition of child immunisation gaps into access and demand, enabling region-specific policy targeting.</p>
+    </section>
+  </main>
+
+  <p class="footer">Project Page · Ritika Singh · <a href="../index.html#projects">Return to portfolio</a></p>
+</div>
+</body>
+</html>

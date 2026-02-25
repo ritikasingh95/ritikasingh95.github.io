@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project 05 - Insights into Neural Networks Across National and Regional Immunisation Outcomes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/project-detail.css">
+</head>
+<body>
+<div class="page">
+  <header class="project-header">
+    <a class="back-link" href="../index.html#projects">Back to Projects</a>
+    <div class="hero-block">
+      <p class="kicker">Project 05 · Extension of Project 03</p>
+      <h1>Insights into Neural Networks Across National and Regional Immunisation Outcomes</h1>
+      <p class="lead">A fresh retraining framework comparing Neural Networks and L1 Logistic Regression for <code>ZD</code>, <code>MCV dropout</code>, and <code>DPT dropout</code>, with explicit national-versus-regional interpretation and mathematical traceability.</p>
+      <div class="meta-row">
+        <span class="pill">Fresh Retrain</span>
+        <span class="pill">NN vs LR</span>
+        <span class="pill">Class-1 Optimization</span>
+        <span class="pill">National vs Regional Analysis</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    <section class="card">
+      <h2>1) Scope and Relation to Previous Work</h2>
+      <p>This project extends <a href="zero-dose-ml.html">Zero-Dose Prediction Using ML</a> from a single-outcome setup to a unified three-outcome framework:</p>
+      <ul>
+        <li><code>ZD</code> (zero dose)</li>
+        <li><code>Dropout BCG to MCV</code></li>
+        <li><code>DPT1 to DPT3 dropout</code></li>
+      </ul>
+      <p>Only fresh outputs from <code>202_final/retrain_outputs/*_fresh</code> are used.</p>
+    </section>
+
+    <section class="card">
+      <h2>2) Data Selection and Sample Definition</h2>
+      <p>The analytical framing follows the NFHS-style 12-23 month cohort logic you outlined.</p>
+      <h3>Sample Filtering (Notation)</h3>
+      <div class="math">S0 = all surveyed children</div>
+      <div class="math">S1 = {i in S0 : b5_i = 1 (alive)}</div>
+      <div class="math">S2 = {i in S1 : 12 <= b19_i <= 23}</div>
+      <p>Working sample is <code>S2</code> after complete-case filtering on model variables.</p>
+      <h3>Data Sources</h3>
+      <div class="path-list">
+        <div class="path-item">202_final/data/merged_data.csv (ZD)</div>
+        <div class="path-item">202_final/data/biswasNew_BCG_MCV.xls (MCV dropout)</div>
+        <div class="path-item">202_final/data/biswasNew_BDPT.xls (DPT dropout)</div>
+      </div>
+    </section>
+
+    <section class="card two-col">
+      <div>
+        <h2>3) Predictor Definitions</h2>
+        <p>Shared feature vector for each record:</p>
+        <div class="math">x_i = [Age_i, FemaleChild_i, Rural_i, state_i, BirthOrder_i, Deprived_i, FamilySize_i, NoAntenatalCare_i, UnassistedBirth_i, MaternalIlliteracy_i]</div>
+        <p>Binary/categorical encodings follow the operational definitions used in retraining scripts.</p>
+      </div>
+      <div>
+        <h2>4) Regional Partition</h2>
+        <p>Let <code>R = {india, north, east, west, south, northeast}</code>.</p>
+        <div class="math">D_{o,r} = {(x_i, y_i^o): outcome=o, region=r}</div>
+        <p>Each outcome <code>o</code> is trained and evaluated separately in each region <code>r</code>.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>5) Train/Eval Protocol</h2>
+      <p>Per outcome and region, splits are generated using stratified shuffling:</p>
+      <div class="math">(Train_{o,r}^{(s)}, Test_{o,r}^{(s)}),   s = 1,2</div>
+      <p>Class proportions are preserved in each split to stabilize minority-class evaluation.</p>
+      <h3>Scaling</h3>
+      <p>Continuous predictors are standardized on train statistics:</p>
+      <div class="math">x'_{ij} = (x_{ij} - mu_j^{train}) / sigma_j^{train}</div>
+    </section>
+
+    <section class="card two-col">
+      <div>
+        <h2>6) Logistic Regression Baseline</h2>
+        <p>LR with L1 regularization and balanced class weighting:</p>
+        <div class="math">p_i = sigma(w^T x_i + b)</div>
+        <div class="math">L_LR = -sum_i alpha_{y_i}[y_i log p_i + (1-y_i) log(1-p_i)] + lambda ||w||_1</div>
+        <p>with class-balance weights:</p>
+        <div class="math">alpha_c proportional 1 / N_c</div>
+      </div>
+      <div>
+        <h2>7) Neural Network Comparator</h2>
+        <p>Tuned MLP classifier:</p>
+        <div class="math">h^(1) = phi(W1 x + b1), ..., h^(L) = phi(WL h^(L-1) + bL)</div>
+        <div class="math">p_i = sigma(w_o^T h^(L) + b_o)</div>
+        <p>Hyperparameter search spans depth, width, regularization, learning rate, batch-size, and training iterations.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>8) Class-1-Focused Threshold Optimization</h2>
+      <p>For each trained model candidate, probabilities are converted to labels using threshold <code>tau</code>:</p>
+      <div class="math">y_hat_i(tau) = 1[p_i >= tau]</div>
+      <p>Class-1 objective:</p>
+      <div class="math">F1_1(tau) = 2 * Prec_1(tau) * Rec_1(tau) / (Prec_1(tau) + Rec_1(tau))</div>
+      <div class="math">tau^* = argmax_tau F1_1(tau), with guardrails tau_min <= tau <= tau_max</div>
+      <p>This ensures optimization is aligned to missed-child detection rather than majority-class accuracy.</p>
+    </section>
+
+    <section class="card">
+      <h2>9) NN Candidate Selection Score</h2>
+      <p>NN candidates are ranked with minority-class emphasis and LR comparison:</p>
+      <div class="math">Score_NN = F1_1_NN + eta * max(0, F1_1_NN - F1_1_LR) - rho * DegeneracyPenalty</div>
+      <p>The LR-margin bonus prioritizes NN candidates that genuinely exceed LR on class-1 performance.</p>
+    </section>
+
+    <section class="card two-col">
+      <div>
+        <h2>10) Evaluation Metrics</h2>
+        <div class="math">Accuracy = (TP + TN) / (TP + TN + FP + FN)</div>
+        <div class="math">Precision_1 = TP / (TP + FP)</div>
+        <div class="math">Recall_1 = TP / (TP + FN)</div>
+        <div class="math">F1_1 = 2 * Precision_1 * Recall_1 / (Precision_1 + Recall_1)</div>
+      </div>
+      <div>
+        <h2>11) National vs Regional Aggregation</h2>
+        <p>Split-level metric:</p>
+        <div class="math">M_{o,r,m}^{(s)} for outcome o, region r, model m, split s</div>
+        <p>Region summary:</p>
+        <div class="math">M_bar_{o,r,m} = (1/S) * sum_s M_{o,r,m}^{(s)}</div>
+        <p>National summary over regions (macro):</p>
+        <div class="math">M_nat_{o,m} = (1/|R*|) * sum_{r in R*} M_bar_{o,r,m}</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>12) NN Feature Importance Mathematics</h2>
+      <p>Permutation AP-drop for feature <code>j</code>:</p>
+      <div class="math">Imp_j = AP(f, X, y) - AP(f, X_perm(j), y)</div>
+      <p>where <code>AP</code> is average precision on held-out data and <code>X_perm(j)</code> shuffles feature <code>j</code> to destroy its signal.</p>
+      <h3>Cross-Outcome Alignment</h3>
+      <div class="math">V_{o,r} = normalized importance vector for outcome o and region r</div>
+      <div class="math">Similarity_{r}(o1, o2) = cos(V_{o1,r}, V_{o2,r})</div>
+    </section>
+
+    <section class="card">
+      <h2>13) Required Comparison Views and Generated Charts</h2>
+      <ol>
+        <li>National LR vs NN comparison for all outcomes.</li>
+        <li>Inter-regional NN feature-importance heatmaps.</li>
+        <li>Region-wise cross-outcome NN importance comparison.</li>
+        <li>National cross-outcome NN importance comparison.</li>
+        <li>Outcome-similarity by region.</li>
+      </ol>
+      <div class="path-list">
+        <div class="path-item">retrain_outputs/cross_outcome_analysis/chart1_national_lr_vs_nn.png</div>
+        <div class="path-item">retrain_outputs/cross_outcome_analysis/chart2_interregional_nn_importance_heatmaps.png</div>
+        <div class="path-item">retrain_outputs/cross_outcome_analysis/chart3_regionwise_outcome_nn_compare.png</div>
+        <div class="path-item">retrain_outputs/cross_outcome_analysis/chart4_national_nn_feature_importance_across_outcomes.png</div>
+        <div class="path-item">retrain_outputs/cross_outcome_analysis/chart5_outcome_similarity_by_region.png</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>14) Feature-Importance Story Pack Outputs</h2>
+      <p>Generated under <code>retrain_outputs/feature_importance_story/</code>:</p>
+      <div class="path-list">
+        <div class="path-item">chartA_national_importance_composition.png</div>
+        <div class="path-item">chartB_national_top_drivers_lollipop.png</div>
+        <div class="path-item">chartC_regional_deviation_heatmaps.png</div>
+        <div class="path-item">chartD_region_top_driver_matrix.png</div>
+        <div class="path-item">chartE_strength_vs_consistency.png</div>
+        <div class="path-item">noteworthy_findings.md</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>15) Reproducibility and Change Log</h2>
+      <h3>New/Updated Scripts (2026-02-25)</h3>
+      <ul>
+        <li><code>202_final/retrain_zd.py</code></li>
+        <li><code>202_final/retrain_mcv.py</code></li>
+        <li><code>202_final/retrain_dpt.py</code></li>
+        <li><code>202_final/retrain_core.py</code></li>
+        <li><code>202_final/build_cross_outcome_visuals.py</code></li>
+        <li><code>202_final/build_feature_importance_story.py</code></li>
+      </ul>
+      <h3>Run Commands</h3>
+      <div class="code">python 202_final/retrain_zd.py
+python 202_final/retrain_mcv.py
+python 202_final/retrain_dpt.py
+python 202_final/build_cross_outcome_visuals.py
+python 202_final/build_feature_importance_story.py</div>
+      <p class="note">This page is intentionally math-explicit so the project logic is transparent from data definition through modeling, metric design, and interpretation.</p>
+    </section>
+  </main>
+
+  <p class="footer">Project Page · Ritika Singh · <a href="../index.html#projects">Return to portfolio</a></p>
+</div>
+</body>
+</html>

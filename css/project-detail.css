@@ -1,0 +1,473 @@
+:root {
+  --ink: #0f0f0f;
+  --paper: #f5efe6;
+  --accent: #c8522a;
+  --muted: #6c665b;
+  --line: rgba(15, 15, 15, 0.14);
+  --panel: rgba(255, 255, 255, 0.7);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: 'Instrument Sans', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.7;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(15, 15, 15, 0.05) 0.6px, transparent 0.6px);
+  background-size: 8px 8px;
+  opacity: 0.3;
+  z-index: -1;
+}
+
+.page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 1.5rem 4rem;
+}
+
+.project-header {
+  padding: 2.25rem 0 2rem;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  text-decoration: none;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 1.6rem;
+  border-bottom: 1px solid transparent;
+}
+
+.back-link:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.hero-block {
+  border: 1px solid var(--line);
+  background: linear-gradient(130deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.55));
+  padding: 2.25rem;
+}
+
+.kicker {
+  margin: 0;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+h1 {
+  margin: 0.55rem 0 0.8rem;
+  font-family: 'DM Serif Display', serif;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.lead {
+  margin: 0;
+  max-width: 72ch;
+  color: var(--muted);
+}
+
+.meta-row {
+  margin-top: 1.35rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.pill {
+  display: inline-flex;
+  padding: 0.26rem 0.64rem;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.content {
+  margin-top: 1.25rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.card {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  padding: 1.4rem 1.5rem;
+}
+
+.card h2 {
+  margin: 0 0 0.7rem;
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(1.35rem, 2.6vw, 1.8rem);
+  letter-spacing: -0.01em;
+}
+
+.card h3 {
+  margin: 1.1rem 0 0.35rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.card p {
+  margin: 0.45rem 0;
+}
+
+.card ul,
+.card ol {
+  margin: 0.4rem 0 0.4rem 1.3rem;
+  padding: 0;
+}
+
+.card li {
+  margin: 0.36rem 0;
+}
+
+.two-col {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.math {
+  margin-top: 0.75rem;
+  border-left: 2.5px solid var(--accent);
+  padding: 0.55rem 0.7rem;
+  background: rgba(200, 82, 42, 0.05);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem;
+  overflow-x: auto;
+}
+
+.code {
+  margin-top: 0.7rem;
+  background: #141414;
+  color: #f1f1f1;
+  padding: 0.85rem 1rem;
+  border-radius: 0;
+  overflow-x: auto;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.path-list {
+  margin-top: 0.45rem;
+  display: grid;
+  gap: 0.34rem;
+}
+
+.path-item {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.lab-grid {
+  margin-top: 0.8rem;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 1rem;
+}
+
+.lab-controls {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.7);
+  padding: 0.9rem;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.lab-label {
+  display: grid;
+  gap: 0.3rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.lab-label select,
+.lab-label input[type="range"] {
+  width: 100%;
+}
+
+.lab-label select {
+  border: 1px solid var(--line);
+  background: #fff;
+  padding: 0.45rem 0.5rem;
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+
+.range-meta {
+  font-size: 0.8rem;
+  color: var(--muted);
+  letter-spacing: 0;
+  text-transform: none;
+  font-family: 'Instrument Sans', sans-serif;
+}
+
+.lab-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.lab-btn {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  padding: 0.5rem 0.8rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.lab-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.lab-visual {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.72);
+  padding: 0.9rem;
+}
+
+.mesh-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, #fff, #f9f3ea);
+}
+
+.lab-caption {
+  margin-top: 0.55rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.metric-grid {
+  margin-top: 0.85rem;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.cluster-grid {
+  margin-top: 0.75rem;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.metric-card {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.7);
+  padding: 0.65rem 0.6rem;
+}
+
+.metric-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.metric-value {
+  margin-top: 0.2rem;
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.35rem;
+  line-height: 1.1;
+}
+
+.metric-delta {
+  margin-top: 0.15rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.metric-delta.up,
+.metric-delta.bad {
+  color: #9c3022;
+}
+
+.metric-delta.down,
+.metric-delta.good {
+  color: #2f6a43;
+}
+
+.metric-delta.neutral {
+  color: var(--muted);
+}
+
+.mini-chart {
+  margin-top: 0.95rem;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.65);
+  padding: 0.75rem;
+}
+
+.mini-chart h3 {
+  margin: 0 0 0.5rem;
+}
+
+.bar-grid {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 58px;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+}
+
+.bar-row.active {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.bar-track {
+  position: relative;
+  height: 10px;
+  background: rgba(15, 15, 15, 0.08);
+}
+
+.bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  background: linear-gradient(90deg, #c8522a, #df8e66);
+}
+
+.variation-list {
+  margin-top: 0.85rem;
+  border: 1px dashed var(--line);
+  background: rgba(255, 255, 255, 0.55);
+  padding: 0.7rem 0.8rem;
+}
+
+.variation-list h3 {
+  margin: 0 0 0.35rem;
+}
+
+.variation-list ul {
+  margin: 0.2rem 0 0 1rem;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  margin-top: 0.7rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.93rem;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 0.55rem 0.5rem;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.table th {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.note {
+  margin-top: 0.7rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px dashed var(--line);
+  font-size: 0.92rem;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.footer {
+  margin-top: 1.4rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--muted);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.footer a {
+  color: inherit;
+}
+
+@media (max-width: 860px) {
+  .hero-block {
+    padding: 1.45rem;
+  }
+
+  .lab-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cluster-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .two-col {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    padding: 1.15rem 1.05rem;
+  }
+
+  .page {
+    padding: 0 1rem 3rem;
+  }
+}

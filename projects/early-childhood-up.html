@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project 02 - Early Childhood Development in Rural Uttar Pradesh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/project-detail.css">
+</head>
+<body>
+<div class="page">
+  <header class="project-header">
+    <a class="back-link" href="../index.html#projects">Back to Projects</a>
+    <div class="hero-block">
+      <p class="kicker">Project 02 · Completed · Early Childhood Development</p>
+      <h1>Levels, Determinants, and Distribution of Early Childhood Development in Rural Uttar Pradesh (Hardoi)</h1>
+      <p class="lead">ECDI2030-based analytic and ML pipeline to estimate developmental status, identify determinants, and generate policy-ready evidence for targeted interventions.</p>
+      <div class="meta-row">
+        <span class="pill">ECDI2030</span>
+        <span class="pill">MCA Wealth Index</span>
+        <span class="pill">Logistic + RF + XGBoost + NN</span>
+        <span class="pill">Repeated CV + SMOTE</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    <section class="card">
+      <h2>1) Project Overview</h2>
+      <ol>
+        <li>Measure ECD levels using ECDI2030 for children 24-59 months.</li>
+        <li>Identify socioeconomic, demographic, and geographic determinants of being developmentally on-track.</li>
+        <li>Produce evidence for targeted policy interventions.</li>
+      </ol>
+      <h3>Sample Snapshot</h3>
+      <ul>
+        <li>Raw sample: about 4,999 children.</li>
+        <li>Complete-case ML sample: about 4,869 children.</li>
+        <li>On-track: about 69.3%.</li>
+        <li>Not on-track: about 30.7%.</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>2) End-to-End Workflow</h2>
+      <ol>
+        <li>Clean/recode ECDI2030 items and key covariates (education, caste, religion, ANC, delivery place, wealth).</li>
+        <li>Construct age-specific on-track outcome.</li>
+        <li>Build MCA wealth index and stable grouped social variables.</li>
+        <li>Run descriptive and stratified inequality analysis.</li>
+        <li>Run first-learner item-level logistic models.</li>
+        <li>Train Logistic, RF, XGBoost, and NN with repeated CV + SMOTE.</li>
+        <li>Compare performance and feature importance.</li>
+        <li>Prepare outputs for reporting and stakeholder discussion.</li>
+      </ol>
+    </section>
+
+    <section class="card two-col">
+      <div>
+        <h2>3) ECDI2030 Scoring Mathematics</h2>
+        <div class="math">S_i = sum_{j=1}^{20} x_{ij},   x_{ij} in {0,1}</div>
+        <p>Age-specific threshold <code>T(a_i)</code>:</p>
+        <div class="math">T(a_i) = 7 (24-29), 9 (30-35), 11 (36-41), 13 (42-47), 15 (48-59)</div>
+        <div class="math">y_i = 1[S_i >= T(a_i)]</div>
+      </div>
+      <div>
+        <h2>4) MCA Wealth Construction</h2>
+        <p>With disjunctive asset vector <code>z_i</code> and first MCA axis loading <code>v_1</code>:</p>
+        <div class="math">w_i = z_i^T v_1</div>
+        <p>Quintile assignment:</p>
+        <div class="math">Q_i in {1,...,5} from empirical quantiles of w_i</div>
+      </div>
+    </section>
+
+    <section class="card two-col">
+      <div>
+        <h2>5) Determinant Logistic Model</h2>
+        <div class="math">Pr(y_i=1 | X_i) = sigma(beta_0 + X_i^T beta),   sigma(t)=1/(1+e^{-t})</div>
+        <div class="math">log(p_i/(1-p_i)) = beta_0 + X_i^T beta</div>
+        <p>Odds ratio for predictor <code>k</code>:</p>
+        <div class="math">OR_k = e^{beta_k}</div>
+      </div>
+      <div>
+        <h2>6) Item-Level First-Learner Models</h2>
+        <p>For ECD item <code>q</code>:</p>
+        <div class="math">log(Pr(q_i=1)/(1-Pr(q_i=1))) = alpha_0 + alpha_1 * FirstLearner_i</div>
+        <div class="math">Item-OR = e^{alpha_1}</div>
+        <p>This isolates item-wise differences tied to first-learner status.</p>
+      </div>
+    </section>
+
+    <section class="card two-col">
+      <div>
+        <h2>7) Imbalance and Learners</h2>
+        <h3>SMOTE</h3>
+        <div class="math">x_new = x_i + lambda(x_nn - x_i),   lambda in (0,1)</div>
+        <h3>Random Forest</h3>
+        <div class="math">y_hat = mode{T_b(x)}_{b=1}^B</div>
+      </div>
+      <div>
+        <h2>8) Boosting Objective</h2>
+        <div class="math">y_hat_i^{(t)} = y_hat_i^{(t-1)} + f_t(x_i)</div>
+        <div class="math">Obj = sum_i l(y_i, y_hat_i) + sum_t Omega(f_t)</div>
+        <p>XGBoost captures nonlinear interactions and improves screening sensitivity.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>9) Evaluation Metrics</h2>
+      <div class="math">Accuracy = (TP + TN) / (TP + TN + FP + FN)</div>
+      <div class="math">Sensitivity = TP / (TP + FN)</div>
+      <div class="math">Specificity = TN / (TN + FP)</div>
+      <div class="math">F1 = 2 * Precision * Recall / (Precision + Recall)</div>
+      <p>Model selection balances interpretability (logistic) and screening sensitivity (tree-based learners).</p>
+    </section>
+
+    <section class="card">
+      <h2>10) Planned Spatial/Multilevel Extension</h2>
+      <div class="math">logit(p_{ij}) = beta_0 + X_{ij} beta + u_j + s_j</div>
+      <p>where <code>u_j ~ N(0, sigma_u^2)</code> and <code>s_j</code> is spatially structured (CAR/BYM-style).</p>
+      <p>Exploratory spatial autocorrelation metric:</p>
+      <div class="math">I = (n/S_0) * [sum_i sum_j w_ij(z_i-z_bar)(z_j-z_bar)] / [sum_i(z_i-z_bar)^2]</div>
+    </section>
+
+    <section class="card">
+      <h2>11) Key Empirical Findings</h2>
+      <ol>
+        <li>Strongest determinants: wealth, maternal education, ANC checkups, block-level location, and delivery place.</li>
+        <li>Lower wealth quintiles and lower maternal education substantially reduce odds of being on-track.</li>
+        <li>First-learner analysis shows pronounced deficits in core learning items (letters, numbers, counting).</li>
+        <li>Tree models typically provide higher recall, while logistic remains most interpretable for determinants.</li>
+      </ol>
+      <p class="note">This project combines social-epidemiological interpretation with predictive modeling so findings are both statistically defensible and policy actionable.</p>
+    </section>
+  </main>
+
+  <p class="footer">Project Page · Ritika Singh · <a href="../index.html#projects">Return to portfolio</a></p>
+</div>
+</body>
+</html>
