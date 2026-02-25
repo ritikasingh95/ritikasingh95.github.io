@@ -1,1407 +1,596 @@
 <!DOCTYPE html>
-<!--[if IE 8 ]><html class="no-js oldie ie8" lang="en"> <![endif]-->
-<!--[if IE 9 ]><html class="no-js oldie ie9" lang="en"> <![endif]-->
-<!--[if (gte IE 9)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ritika Singh — AI Researcher</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0d0d0d;
+    --paper: #f5f0e8;
+    --accent: #c8522a;
+    --muted: #6b6459;
+    --line: rgba(13,13,13,0.12);
+    --card-bg: rgba(255,255,255,0.55);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--paper); color: var(--ink); font-family: 'Instrument Sans', sans-serif; font-size: 16px; line-height: 1.65; overflow-x: hidden; cursor: none; }
 
-   <!--- basic page needs
-   ================================================== -->
-   <meta charset="utf-8">
-	<title>Ritika Singh</title>
-	<meta name="description" content="">  
-	<meta name="author" content="">
+  #cursor { position: fixed; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); transition: width 0.2s, height 0.2s, background 0.2s; }
+  #cursor-ring { position: fixed; width: 36px; height: 36px; border: 1.5px solid var(--accent); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%, -50%); transition: width 0.25s, height 0.25s; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E"); pointer-events: none; z-index: 1000; opacity: 0.4; }
 
-   <!-- mobile specific metas
-   ================================================== -->
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 500; display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 4rem; background: rgba(245,240,232,0.88); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+  .nav-logo { font-family: 'DM Serif Display', serif; font-size: 1.15rem; letter-spacing: -0.02em; }
+  .nav-links { display: flex; gap: 2rem; list-style: none; align-items: center; }
+  .nav-links a { font-family: 'DM Mono', monospace; font-size: 0.75rem; letter-spacing: 0.08em; text-decoration: none; color: var(--muted); text-transform: uppercase; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--accent); }
+  .nav-cv-btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1.1rem; background: var(--accent); color: #fff !important; font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; transition: background 0.2s, transform 0.2s; }
+  .nav-cv-btn:hover { background: var(--ink) !important; transform: translateY(-1px); }
 
- 	<!-- CSS
-   ================================================== -->
-   <link rel="stylesheet" href="css/base.css">  
-   <link rel="stylesheet" href="css/main.css">
-   <link rel="stylesheet" href="css/vendor.css">     
+  #hero { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; align-items: center; padding: 7rem 4rem 4rem; position: relative; overflow: hidden; }
+  .hero-bg-text { position: absolute; font-family: 'DM Serif Display', serif; font-size: clamp(8rem, 20vw, 18rem); color: rgba(13,13,13,0.04); pointer-events: none; line-height: 1; bottom: -2rem; right: -2rem; user-select: none; }
+  .hero-left { position: relative; z-index: 2; }
+  .hero-tag { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; animation: fadeUp 0.8s ease both 0.2s; }
+  .hero-tag::before { content: ''; width: 2rem; height: 1px; background: var(--accent); }
+  h1 { font-family: 'DM Serif Display', serif; font-size: clamp(3.5rem, 7vw, 6rem); line-height: 1.0; letter-spacing: -0.03em; margin-bottom: 1.5rem; animation: fadeUp 0.8s ease both 0.35s; }
+  h1 em { font-style: italic; color: var(--accent); }
+  .hero-desc { max-width: 480px; color: var(--muted); font-size: 1.05rem; line-height: 1.75; margin-bottom: 2.5rem; animation: fadeUp 0.8s ease both 0.5s; }
+  .hero-cta { display: flex; gap: 1rem; flex-wrap: wrap; animation: fadeUp 0.8s ease both 0.65s; }
 
-   <!-- script
-   ================================================== -->   
-	<script src="js/modernizr.js"></script>
-	<script src="js/pace.min.js"></script>
+  .btn-primary { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.85rem 2rem; background: var(--ink); color: var(--paper); font-family: 'DM Mono', monospace; font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; transition: background 0.25s, transform 0.2s; }
+  .btn-primary:hover { background: var(--accent); transform: translateY(-2px); }
+  .btn-secondary { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.85rem 2rem; border: 1.5px solid var(--ink); color: var(--ink); font-family: 'DM Mono', monospace; font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; transition: all 0.25s; }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+  .btn-accent { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.85rem 2rem; border: 1.5px solid var(--accent); color: var(--accent); font-family: 'DM Mono', monospace; font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; transition: all 0.25s; }
+  .btn-accent:hover { background: var(--accent); color: #fff; transform: translateY(-2px); }
 
-   <!-- favicons
-	================================================== -->
-	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-	<link rel="manifest" href="/site.webmanifest">
-	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-	<meta name="msapplication-TileColor" content="#da532c">
-	<meta name="theme-color" content="#ffffff">
+  .hero-right { display: flex; flex-direction: column; align-items: flex-end; gap: 1.25rem; position: relative; z-index: 2; }
+  .stat-card { background: var(--card-bg); border: 1px solid var(--line); padding: 1.5rem 2rem; backdrop-filter: blur(8px); min-width: 240px; position: relative; overflow: hidden; animation: floatIn 0.8s ease both; }
+  .stat-card:nth-child(2) { margin-right: 2.5rem; animation-delay: 0.15s; }
+  .stat-card:nth-child(3) { margin-right: 1.25rem; animation-delay: 0.3s; }
+  .stat-card:nth-child(4) { animation-delay: 0.45s; }
+  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--accent); }
+  .stat-number { font-family: 'DM Serif Display', serif; font-size: 2.25rem; line-height: 1; margin-bottom: 0.25rem; }
+  .stat-label { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
 
-	<link rel="shortcut icon" href="https://github.com/ritikasingh95">
-	<link rel="shortcut icon"> <img src="images/RitikaLogo.png" type="image/x-icon" width="1%" height="auto"/>
-	<link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">	
+  section { padding: 6rem 4rem; }
+  .section-header { display: flex; align-items: baseline; gap: 1.5rem; margin-bottom: 4rem; border-bottom: 1px solid var(--line); padding-bottom: 1.5rem; }
+  .section-num { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--accent); letter-spacing: 0.12em; }
+  h2 { font-family: 'DM Serif Display', serif; font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -0.03em; line-height: 1.1; }
+
+  #about { background: var(--ink); color: var(--paper); }
+  #about .section-header { border-color: rgba(245,240,232,0.12); }
+  #about .section-num { color: #c8a07a; }
+  .about-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 5rem; align-items: start; }
+  .about-text p { color: rgba(245,240,232,0.75); margin-bottom: 1.25rem; line-height: 1.8; }
+  .about-text p:first-child { font-family: 'DM Serif Display', serif; font-size: 1.35rem; color: var(--paper); line-height: 1.55; font-style: italic; }
+  .interest-list { list-style: none; }
+  .interest-list li { display: flex; align-items: center; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid rgba(245,240,232,0.08); font-family: 'DM Mono', monospace; font-size: 0.82rem; color: rgba(245,240,232,0.65); letter-spacing: 0.04em; transition: color 0.2s; }
+  .interest-list li:hover { color: var(--paper); }
+  .interest-list li::before { content: '→'; color: #c8a07a; }
+
+  .pub-list { display: flex; flex-direction: column; }
+  .pub-item { display: grid; grid-template-columns: auto 1fr auto; gap: 2rem; align-items: center; padding: 2rem 0; border-bottom: 1px solid var(--line); position: relative; transition: all 0.25s; }
+  .pub-item::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: var(--accent); transition: width 0.3s ease; }
+  .pub-item:hover::after { width: 100%; }
+  .pub-year { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.1em; white-space: nowrap; }
+  .pub-details h3 { font-family: 'Instrument Sans', sans-serif; font-weight: 600; font-size: 1rem; margin-bottom: 0.35rem; line-height: 1.4; }
+  .pub-meta { font-size: 0.82rem; color: var(--muted); }
+  .pub-venue { display: inline-block; font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); background: rgba(200,82,42,0.08); padding: 0.2rem 0.6rem; margin-top: 0.5rem; }
+  .pub-link { display: inline-flex; align-items: center; gap: 0.3rem; font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: #4a6fa5; text-decoration: none; margin-top: 0.5rem; margin-left: 0.75rem; opacity: 0; transition: opacity 0.2s; border-bottom: 1px solid #4a6fa5; }
+  .pub-item:hover .pub-link { opacity: 1; }
+  .pub-type { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); writing-mode: vertical-rl; transform: rotate(180deg); }
+
+  #projects { background: #f8f4ec; }
+  .projects-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5px; background: var(--line); }
+  .project-card { background: var(--paper); padding: 2.5rem; position: relative; overflow: hidden; transition: background 0.3s; cursor: pointer; }
+  .project-card:hover { background: #fff; }
+  .project-card::before { content: attr(data-num); position: absolute; top: 1.5rem; right: 2rem; font-family: 'DM Serif Display', serif; font-size: 4rem; color: rgba(13,13,13,0.05); line-height: 1; transition: color 0.3s; }
+  .project-card:hover::before { color: rgba(200,82,42,0.07); }
+  .project-tag { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; }
+  .project-card h3 { font-family: 'DM Serif Display', serif; font-size: 1.35rem; margin-bottom: 0.75rem; line-height: 1.3; }
+  .project-card p { font-size: 0.9rem; color: var(--muted); line-height: 1.7; margin-bottom: 1.5rem; }
+  .project-techs { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .tech-tag { font-family: 'DM Mono', monospace; font-size: 0.65rem; padding: 0.2rem 0.6rem; border: 1px solid var(--line); color: var(--muted); letter-spacing: 0.05em; }
+
+  .timeline { position: relative; padding-left: 2rem; }
+  .timeline::before { content: ''; position: absolute; left: 0; top: 0.5rem; bottom: 0; width: 1px; background: var(--line); }
+  .timeline-item { position: relative; padding-left: 2.5rem; padding-bottom: 3rem; opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .timeline-item.visible { opacity: 1; transform: translateY(0); }
+  .timeline-item::before { content: ''; position: absolute; left: -2rem; top: 0.4rem; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); border: 2px solid var(--paper); box-shadow: 0 0 0 1px var(--accent); }
+  .timeline-period { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.4rem; }
+  .timeline-item h3 { font-weight: 600; font-size: 1.05rem; margin-bottom: 0.2rem; }
+  .timeline-org { font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--accent); margin-bottom: 0.65rem; }
+  .timeline-desc { font-size: 0.9rem; color: var(--muted); line-height: 1.7; max-width: 520px; }
+
+  #awards { background: var(--ink); color: var(--paper); }
+  #awards .section-header { border-color: rgba(245,240,232,0.12); }
+  #awards .section-num { color: #c8a07a; }
+  .awards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5px; background: rgba(245,240,232,0.06); }
+  .award-card { background: rgba(13,13,13,1); padding: 2.5rem; transition: background 0.3s; }
+  .award-card:hover { background: #161616; }
+  .award-icon { font-size: 1.5rem; margin-bottom: 1rem; }
+  .award-card h3 { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: var(--paper); margin-bottom: 0.5rem; line-height: 1.35; }
+  .award-card p { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.06em; color: rgba(245,240,232,0.45); }
+
+  /* CERTIFICATES */
+  #certificates { background: var(--paper); }
+  .certs-intro { max-width: 560px; color: var(--muted); margin-bottom: 3rem; font-size: 0.95rem; line-height: 1.75; }
+  .certs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+  .cert-card { border: 1px solid var(--line); padding: 1.75rem; display: flex; flex-direction: column; gap: 0.75rem; transition: all 0.25s; text-decoration: none; color: var(--ink); position: relative; overflow: hidden; background: var(--card-bg); }
+  .cert-card::after { content: '↗'; position: absolute; top: 1.25rem; right: 1.25rem; font-size: 0.9rem; color: var(--muted); transition: color 0.2s, transform 0.2s; }
+  .cert-card:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .cert-card:hover::after { color: var(--accent); transform: translate(2px, -2px); }
+  .cert-icon { font-size: 1.35rem; }
+  .cert-name { font-family: 'Instrument Sans', sans-serif; font-weight: 600; font-size: 0.92rem; line-height: 1.4; padding-right: 1.5rem; }
+  .cert-meta { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; color: var(--muted); transition: color 0.2s; }
+  .cert-card:hover .cert-meta { color: rgba(245,240,232,0.5); }
+
+  /* CV DOWNLOAD BANNER */
+  #cv-download { background: var(--accent); color: #fff; padding: 4rem; display: flex; align-items: center; justify-content: space-between; gap: 2rem; }
+  .cv-download-text h3 { font-family: 'DM Serif Display', serif; font-size: 1.75rem; margin-bottom: 0.5rem; color: #fff; }
+  .cv-download-text p { font-size: 0.92rem; color: rgba(255,255,255,0.75); }
+  .cv-download-btn { display: inline-flex; align-items: center; gap: 0.6rem; padding: 1rem 2.5rem; background: #fff; color: var(--accent); font-family: 'DM Mono', monospace; font-size: 0.82rem; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; white-space: nowrap; transition: all 0.25s; }
+  .cv-download-btn:hover { background: var(--ink); color: #fff; transform: translateY(-2px); }
+
+  #skills { background: #f8f4ec; }
+  .skills-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem; }
+  .skill-group h3 { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.25rem; }
+  .skill-items { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  .skill-item { font-family: 'DM Mono', monospace; font-size: 0.78rem; padding: 0.4rem 1rem; background: var(--card-bg); border: 1px solid var(--line); transition: all 0.2s; letter-spacing: 0.03em; }
+  .skill-item:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); transform: translateY(-2px); }
+
+  #contact { background: var(--paper); text-align: center; padding: 7rem 4rem; }
+  .contact-big { font-family: 'DM Serif Display', serif; font-size: clamp(2.5rem, 7vw, 5.5rem); line-height: 1.05; letter-spacing: -0.04em; margin-bottom: 2rem; }
+  .contact-big em { font-style: italic; color: var(--accent); }
+  .contact-links { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; margin-top: 2.5rem; }
+  .contact-link { display: flex; align-items: center; gap: 0.6rem; font-family: 'DM Mono', monospace; font-size: 0.82rem; letter-spacing: 0.06em; color: var(--muted); text-decoration: none; padding-bottom: 0.25rem; border-bottom: 1px solid var(--line); transition: all 0.2s; }
+  .contact-link:hover { color: var(--accent); border-color: var(--accent); }
+
+  footer { background: var(--ink); color: rgba(245,240,232,0.3); text-align: center; padding: 2rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; }
+  footer a { color: rgba(245,240,232,0.3); text-decoration: none; }
+
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes floatIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+
+  .cursor-grow #cursor { width: 24px; height: 24px; background: rgba(200,82,42,0.3); }
+  .cursor-grow #cursor-ring { width: 8px; height: 8px; }
+  a, button, .project-card, .award-card, .skill-item, .cert-card { cursor: none; }
+
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { gap: 1rem; flex-wrap: wrap; }
+    #hero { grid-template-columns: 1fr; padding: 6rem 1.5rem 3rem; }
+    .hero-right { align-items: flex-start; }
+    section { padding: 4rem 1.5rem; }
+    .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+    .projects-grid { grid-template-columns: 1fr; }
+    .awards-grid { grid-template-columns: 1fr; }
+    .certs-grid { grid-template-columns: 1fr 1fr; }
+    .skills-grid { grid-template-columns: 1fr 1fr; }
+    .pub-item { grid-template-columns: 1fr; gap: 0.75rem; }
+    .pub-type { writing-mode: initial; transform: none; }
+    .stat-card:nth-child(2), .stat-card:nth-child(3) { margin-right: 0; }
+    #cv-download { flex-direction: column; text-align: center; padding: 3rem 1.5rem; }
+  }
+</style>
 </head>
-
-<body id="top">
-
-	<!-- header 
-   ================================================== -->
-   <header>   	
-   	<div class="row">
-
-   		<div class="top-bar">
-   			<a class="menu-toggle" href="#"><span>Menu</span></a>
-
-	   		<div class="logo">
-		         <a href="index.html"></a>
-		      </div>		      
-
-		   	<nav id="main-nav-wrap">
-					<ul class="main-navigation">
-						<li class="current"><a class="smoothscroll"  href="#intro" title="">Home</a></li>
-						<li><a class="smoothscroll"  href="#about" title="">About</a></li>
-						<li><a class="smoothscroll"  href="#resume" title="">Resume</a></li>
-                        <li><a href="./Documents/RitikaSinghResume.pdf" title="" target="_blank">Resume_PDF</a></li>
-						<li><a class="smoothscroll"  href="#portfolio" title="">Portfolio</a></li>
-						<li><a class="smoothscroll"  href="#services" title="">Employability</a></li>					
-						<li><a class="smoothscroll"  href="#contact" title="">Contact</a></li>
-						<li><a href="projects.html" title="">Projects</a></li>		
-										
-					</ul>
-				</nav>    		
-   		</div> <!-- /top-bar --> 
-   		
-   	</div> <!-- /row --> 		
-   </header> <!-- /header -->
-
-	<!-- intro section
-   ================================================== -->
-   <section id="intro">   
-
-   	<div class="intro-overlay"></div>	
-
-   	<div class="intro-content">
-   		<div class="row">
-
-   			<div class="col-twelve">
-
-	   			<h5>School of Artificial Intelligence (ScAI)</h5>
-				<h5>Indian Institute of Technology, Delhi</h5>
-	   			<h1>Ritika Singh.</h1>
-
-	   			<p class="intro-position">
-	   				<span>Data Analytics</span>
-					   <span>Machine Learning</span>
-	   				<span>Artificial Intelligence</span> 
-	   			</p>
-
-	   			<a class="button stroke smoothscroll" href="#about" title="">learn more</a>
-				 
-
-	   		</div>  
-   			
-   		</div>   		 		
-   	</div> <!-- /intro-content --> 
-
-   	<ul class="intro-social">        
-         <li><a href="https://www.linkedin.com/in/ritika-singh-90ba66114/"><i class="fa fa-linkedin"></i></a></li>
-         <li><a href="https://github.com/ritikasingh95"><i class="fa fa-github"></i></a></li>
-         <li><a href="https://medium.com/@scai291195"><i class="fa fa-pencil"></i></a></li>
-      </ul> <!-- /intro-social -->      	
-
-   </section> <!-- /intro -->
-
-
-
-   <!-- about section
-   ================================================== -->
-   <section id="about">  
-
-   	<div class="row section-intro">
-   		<div class="col-twelve">
-
-   			<h5>About</h5>
-   			<h1>"Anything’s possible if you’ve got enough nerve."</h1>
-
-   			<div class="intro-info">
-
-   				<img src="images/Ritika.JPG" alt="Profile Picture">
-
-   				<p class="lead"> Pursuing Doctor of Philosophy in Artificial Intelligence at <a href="https://scai.iitd.ac.in">ScAI, IIT Delhi</a>, under the supervision of <a href="https://web.iitd.ac.in/~sumeet/index.htm">Prof.Sumeet Agarwal.</a><br><br>My research interests are Data science, machine learning, deep learning, and artificial intelligence. Computational Social Science is the domain I am currently working in.<br> <br> Experience with Python, Data Visualization, Tableau, PyTorch, NumPy, Pandas, Matplotlib, Seaborn, Scikit-Learn, Tensorflow, Deep Learning, NLP, Neural Networks, Image Classification, Plotly, Git, and more.</p>
-   			</div>   			
-
-   		</div>   		
-   	</div> <!-- /section-intro -->
-
-   	<div class="row about-content">
-
-   		<div class="col-four tab-full">
-
-   			<h3>Profile</h3>
-   			<p></p>
-
-   			<ul class="info-list">
-   				<li>
-   					<strong>Full Name:</strong>
-   					<span>Ritika Singh</span>
-   				</li>
-   				<li>
-   					<strong>Designation:</strong>
-   					<span>Ph.D. research scholar</span>
-   				</li>
-   				<li>
-   					<strong>Website:</strong>
-						<span><a href="https://ritikasingh95.github.io">RitikaSingh</span></a>
-   				</li>
-   				<li>
-   					<strong>Email:</strong></a>
-   					<span><a href="mailto:ritika291195@icloud.com">ritika291195@icloud.com</span></a>
-   				</li>
-
-   			</ul> <!-- /info-list -->
-
-   		</div>
-
-   		<div class="col-eight tab-full">
-
-   			<h3>Skills</h3>
-   			<p></p>
-
-				<ul class="skill-bars">
-				   <li>
-				   	<div class="progress percent90"><span>Every Day</span></div>
-				   	<strong>Python, R, Pandas, Numpy, Matplotlib, Tableau</strong>
-				   </li>
-				   <li>
-				   	<div class="progress percent80"><span>Having Fun</span></div>
-				   	<strong>PyTorch, OpenCV, Android App development</strong>
-				   </li>
-				   <li>
-				   	<div class="progress percent80"><span>Well Acquainted</span></div>
-				   	<strong> SAP Security, Business Analytics</strong>
-				   </li>
-				   <li>
-				   	<div class="progress percent90"><span>Love It</span></div>
-				   	<strong>Scikit-Learn, Tensorflow</strong>
-				   </li>
-				   <li>
-
-				   	<div class="progress percent95"><span>Doing It Now</span></div>
-				   	<strong>Research Writing, Photography, Blogging</strong>
-				   </li>
-      
-				</ul> <!-- /skill-bars -->		
-
-   		</div>
-
-   	</div>
-
-   	<div class="row button-section">
-   		<div class="col-twelve">
-   			<a href="#contact" title="Hire Me" class="button stroke smoothscroll">More Info</a>
-   			<a href="mailto:ritika291195@icloud.com" class="button stroke smoothscroll">Reach Out</a>
-   		</div>   		
-   	</div>
-
- </section>
-
- 
-	<!-- Portfolio Section
-   ================================================== -->
-   <section id="portfolio">
-
-		<div class="row section-intro">
-   		<div class="col-twelve">
-
-			   <h5>Portfolio</h5>
-			  
-   			<h1>What have I been up to lately?</h1>
-
-   			<p class="lead">Look here for a collection of my latests projects, past experiences, research papers, and more.</p>
-			
-   		</div>   		
-   	</div> <!-- /section-intro--> 
-
-   	<div class="row portfotlio-content">
-
-   		<div class="col-twelve">
-
-   			<!-- portfolio-wrapper -->
-	         <div id="folio-wrapper" class="block-1-2 block-mob-full stack">
-
-					<div class="bgrid folio-item">
-							<div class="item-wrap">
-								<img src="images/portfolio/ResearchProjectsImage.jpg" alt="Img via Pixabay">
-							   <a href="#modal-05" class="overlay">             		                  
-								  <div class="folio-item-table">
-									  <div class="folio-item-cell">
-										  <h3 class="folio-title">Projects</h3>	     					    
-												  <span class="folio-types">
-													   Data Science, Machine Learning, Artificial Intelligence, <br> and Deep Learning Projects and Examples
-												</span>		     		
-											 </div> 	                      	
-								  </div>                    
-							   </a>
-							</div>
-							 </div> <!-- /folio-item -->
-
-	        		<div class="bgrid folio-item">
-	               <div class="item-wrap">
-	               	<img src="images/portfolio/Writing copy.jpg"alt="Img via Pixabay">
-	               	<a href="#modal-02" class="overlay">              		                  
-	                     <div class="folio-item-table">
-	                     	<div class="folio-item-cell">
-	                     		<h3 class="folio-title">Medium</h3>  				    
-		     					    	<span class="folio-types">
-												Find me on Medium 
-		     					      </span>		   		
-		     					   </div> 	                      	
-	                     </div>                   
-	                  </a>
-	               </div>
-	        		</div> <!-- /folio-item -->
-
-	            <div class="bgrid folio-item">
-	               <div class="item-wrap">
-	               	<img src="images/portfolio/ResearchPapersImage.jpg"alt="Img via Pixabay">
-	                  <a href="#modal-03" class="overlay">             		                  
-	                     <div class="folio-item-table">
-	                     	<div class="folio-item-cell">
-	                     		<h3 class="folio-title">Publications</h3>	     					    
-		     					    	<span class="folio-types">
-															     					      </span>		     		
-		     					   </div> 	                      	
-	                     </div>                    
-	                  </a>
-	               </div>
-	        		</div> <!-- /folio-item -->
-
-					<div class="bgrid folio-item">
-							<div class="item-wrap">
-								<img src="images/portfolio/Github.jpg" alt="Image via Pixabay">
-							   <a href="#modal-01" class="overlay">	                  	           
-								  <div class="folio-item-table">
-									  <div class="folio-item-cell">
-												 <h3 class="folio-title">Find me on GitHub</h3>	     					    
-												   <span class="folio-types">
-													   Peruse my Repositories
-												 </span>
-											 </div>	                      	
-								  </div>                    
-							   </a>
-							</div>	               
-							 </div> <!-- /folio-item -->	        	
-
-	            
-	            <!-- modal popups - begin
-	            ============================================================= -->
-	            <div id="modal-01" class="popup-modal slider mfp-hide">	
-
-				     	<div class="media">
-				     		<img src="images/portfolio/Github.jpg" alt="" />
-				     	</div>      	
-
-					   <div class="description-box">
-					      <h4>Find Me On GitHub</h4>		      
-					      <p>A collection of my open source projects and repositories.</p>
-
-					      <div class="categories">Data Science</div>			               
-					   </div>
-
-			         <div class="link-box">
-			            <a href="https://github.com/bonn0062">Show Me</a>
-					      <a href="#" class="popup-modal-dismiss">Close</a>
-			         </div>		      
-
-				   </div> <!-- /modal-01 -->
-
-				   <div id="modal-02" class="popup-modal slider mfp-hide">	
-
-				     	<div class="media">
-				     		<img src="images/portfolio/Writing copy.jpg" alt="" />
-				     	</div>      	
-
-					   <div class="description-box">
-					      <h4>Medium</h4>		      
-						<p>My research interests are Data science, machine learning, deep learning, and artificial intelligence. Computational Social Science is the domain I am currently working in.
-						</p>
-						  <div class="categories">My Story</div>			               
-					   </div>
-
-			         <div class="link-box">
-			            <a href="https://medium.com/@scai291195">Show Me</a>
-					      <a href="#" class="popup-modal-dismiss">Close</a>
-			         </div>		      
-
-				   </div> <!-- /modal-02 -->
-
-				   <div id="modal-03" class="popup-modal slider mfp-hide">	
-
-				     	<div class="media">
-				     		<img src="images/portfolio/ResearchPapersImage.jpg" alt="" />
-				     	</div>      	
-
-					   <div class="description-box">
-					      <h4>Publications</h4>		      
-
-					      <p></p><a href="./Documents/Publications/Exploratory Data Analysis and Customer Segmentation for Smartphones.pdf" target="_blank"> Exploratory Data Analysis and Customer Segmentation for Smartphones.</a>
-
-                          <p></p><a href="./Documents/Publications/Analysis and Simulation of COVID-19.pdf" target="_blank"> Analysis and Simulation of COVID-19.</a>
-
-
-                          <p></p><a href="./Documents/Publications/YOUTUBE COMMENTS SENTIMENT ANALYSIS.pdf" target="_blank"> Youtube comments sentiment analysis</a>
-
-                          <p></p><a href="./Documents/Publications/PubliElectronic Voting System Using Blockchaincation2.pdf" target="_blank"> Electronic Voting System using Blockchain.</a>
-
-					      <div class="categories">Coding, Research Writing</div>			               
-					   </div>
-
-			         <div class="link-box">
-			            <a href="mailto:ritika291195@icloud.com">Ask me</a>
-
-					      <a href="#" class="popup-modal-dismiss">Close</a>
-			         </div>		      
-
-				   </div> <!-- /modal-03 -->
-
-				   <div id="modal-04" class="popup-modal slider mfp-hide">	
-
-				     	<div class="media">
-				     		<img src="images/portfolio/Projects.jpg" alt="" />
-				     	</div>      	
-
-					   <div class="description-box">
-					      <h4>Data Science/Data Analysis/Business Analysis</h4>		      
-					      <p>Completed the Bertelsmann Data Science Scholarship program, which focused on Python, SQL, data manipulation and visualization. Completing the challenge in the top 10% of students allowed me to complete the Business Analyst/Data Foundations for Enterprise Nanodegree with a full scholarship.</p>
-
-					      <div class="categories">Data Science, Data Analysis, Business Analysis, Data Visualization</div>			               
-					   </div>
-
-			         <div class="link-box">
-			            <a href="https://www.udacity.com/bertelsmann-data-scholarships">Show Me</a>
-					      <a href="#" class="popup-modal-dismiss">Close</a>
-			         </div>		      
-
-				   </div> <!-- /modal-04 -->
-
-				   <div id="modal-05" class="popup-modal slider mfp-hide">	
-
-				     	<div class="media">
-				     		<img src="images/portfolio/ResearchProjectsImage.jpg" alt="" />
-				     	</div>      	
-
-					   <div class="description-box">
-					      <h4>Projects</h4>		      
-					      <p>Projects and exercises that I've been working on:</p>
-
-					      <div class="categories">Data Science, Machine Learning, Coding, Programming</div>			               
-					   </div>
-
-			         <div class="link-box">
-							<a href="projects.html"title="">Show Me</a>
-					      <a href="#" class="popup-modal-dismiss">Close</a>
-			         </div>		      
-
-				   </div> <!-- /modal-05 -->
-
-				   <div id="modal-06" class="popup-modal slider mfp-hide">	
-
-				     	<div class="media">
-				     		<img src="images/portfolio/Paint.jpg" alt="" />
-				     	</div>      	
-
-					   <div class="description-box">
-					      <h4>Machine Learning/Deep Learning/AI</h4>		      
-					      <p>Along with the machine learning projects featured on the Projects page, I also participated in the competitive Udacity Facebook AI PyTorch Scholarship Program.</p>
-
-					      <div class="categories">Machine Learning, Deep Learning, AI</div>			               
-					   </div>
-
-			         <div class="link-box">
-			            <a href="https://www.udacity.com/facebook-pytorch-scholarship">Show Me</a>
-					      <a href="#" class="popup-modal-dismiss">Close</a>
-			         </div>		      
-
-				   </div> <!-- /modal-06 -->
-
-
-				   <!-- modal popups - end
-	            ============================================================= -->
-
-	         </div> <!-- /portfolio-wrapper --> 
-
-   		</div>  <!-- /twelve -->   
-
-   	</div> <!-- /portfolio-content --> 
-		
-	</section> <!-- /portfolio --> 
-
-<!--</section>  /process-->    
-<!--add download cv button (right below hire me)
-<a href="#" title="Download CV" class="button button-primary">Download CV</a>-->
-
-
-<!-- services Section
-================================================== -->
-	<section id="services">
-
-		<div class="overlay"></div>
-
-		<div class="row section-intro">
-   		<div class="col-twelve">
-
-   			<h5>Employability</h5>
-   			<h1>What do I bring to the table?</h1>
-
-   			<p class="lead">Let me simplify my resume. <br><br> I have experience with artificial intelligence, machine learning, deep learning, data analysis and visualization, business analysis, and android application development. Always excited to learn about new products and technologies.</p>
-
-   		</div>   		
-   	</div> <!-- /section-intro -->
-
-   	<div class="row services-content">
-
-   		<div id="owl-slider" class="owl-carousel services-list">
-
-	      	<div class="service">	
-
-	      		<span class="icon"><i class="icon-earth"></i></span>            
-
-	            <div class="service-content">	
-
-	            	 <h3>Data Analysis</h3>
-
-		            <p class="desc">Comfortable with Python, SQL, Tableau, PyTorch, NumPY, Matplotlib, Seaborn, Scikit-Learn, and more, I can analyze and understand the data in a way that makes sense to the panel.
-	         		</p>
-	         		
-	         	</div> 	         	 
-
-				</div> <!-- /service -->
-
-			   <div class="service">
-
-			   	<span class="icon"><i class="icon-paint-brush"></i></span>		            
-
-	            <div class="service-content">
-
-	            	<h3>Research writing</h3>
-
-		            <p class="desc">I have completed the HSL800 course at IIT Delhi that aims to equip graduate students with necessary skills needed for research writing. I'm proficient at summarizing even the most complicated concepts. I do have experience writing articles that get published. One can approach me with any existing content and material if it requires greater user-friendly readability.
-	        			</p> 
-
-	            </div> 	            	               
-               
-
-			   </div> <!-- /service -->
-			   <div class="service">	
-
-					<span class="icon"><i class="icon-window"></i></span>                          
-
-	            <div class="service-content">	
-
-	            	<h3>Artificial Intelligence</h3>  
-
-		            <p class="desc">Previously worked on insightful projects in the domain of machine learning, data analysis and visualization, natural language processing, AI and more.
-	         		</p>
-
-	            </div>	 
-				</div> <!-- /service -->
-
-	      </div> <!-- /services-list -->
-   		
-   	</div> <!-- /services-content -->
-		
-	</section> <!-- /services -->	
-
-	<!-- stats Section
-   ================================================== -->
-	<section id="stats" class="count-up">
-
-		<div class="row">
-			<div class="col-twelve">
-
-				<div class="block-1-6 block-s-1-3 block-tab-1-2 block-mob-full stats-list">
-
-					<div class="bgrid stat">
-
-						<div class="icon-part">
-							<i class="icon-pencil-ruler"></i>
-						</div>
-
-						<h3 class="stat-count">
-							5
-						</h3>
-
-						<h5 class="stat-title">
-							Credit Courses Completed
-						</h5>
-
-					</div> <!-- /stat -->					
-
-					<div class="bgrid stat">
-
-						<div class="icon-part">
-							<i class="icon-book"></i>
-						</div>
-
-						<h3 class="stat-count">
-							120
-						</h3>
-
-						<h5 class="stat-title">
-							Books Read
-						</h5>
-
-					</div> <!-- /stat -->
-
-					<div class="bgrid stat">
-
-						<div class="fa fa-film" style="font-size:48px; color:black>
-							<i class="icon-film"></i>
-						</div>
-
-						<h3 class="stat-count">
-							20
-						</h3>
-
-						<h5 class="stat-title">
-							Netflix series binged
-						</h5>
-
-					</div> <!-- /stat -->									
-
-					<div class="bgrid stat">
-
-						<div class="icon-part">
-							<i class="icon-light-bulb"></i>
-						</div>
-
-						<h3 class="stat-count">
-							1500
-						</h3>
-
-						<h5 class="stat-title">
-							Crazy Ideas
-						</h5>
-
-					</div> <!-- /stat -->
-
-					<div class="bgrid stat">
-
-						<div class="icon-part">
-							<i class="icon-cup"></i>
-						</div>
-
-						<h3 class="stat-count">
-							24
-						</h3>
-
-						<h5 class="stat-title">
-							Daily Coffee Cups
-						</h5>
-
-					</div> <!-- /stat -->
-
-					<div class="bgrid stat">
-
-						<div class="icon-part">
-							<i class="icon-clock"></i>
-						</div>
-
-						<h3 class="stat-count">
-							7200
-						</h3>
-
-						<h5 class="stat-title">
-							Hours
-						</h5>
-
-					</div> <!-- /stat -->
-
-				</div> <!-- /stats-list -->
-
-			</div> <!-- /twelve -->
-		</div> <!-- /row -->
-
-	</section> <!-- /stats -->
-
-
-   <!-- resume Section
-   ================================================== -->
-	<section id="resume" class="grey-section">
-
-		<div class="row section-intro">
-   		<div class="col-twelve">
-
-   			<h5>Resume</h5>
-   			<h1>More of my credentials.</h1>
-
-   			<p class="lead">Currently working as research scholar on project-by-project basis, will update a few of the things that I've been working on lately:</p>
-
-   		</div>   		
-   	</div> <!-- /section-intro--> 
-
-   	<div class="row resume-timeline">
-
-   		<div class="col-twelve resume-header">
-
-   			<h2>Work Experience</h2>
-
-   		</div> <!-- /resume-header -->
-
-   		<div class="col-twelve">
-
-   			<div class="timeline-wrap">
-
-   				<div class="timeline-block">
-
-	   				<div class="timeline-ico">
-	   					<i class="fa fa-briefcase"></i>
-	   				</div>
-
-	   				<div class="timeline-header">
-	   					<h3>Teaching Assistant - ELL 888: Advanced Machine Learning (Foundations in High-Dimensional and  Graph ML)</h3>
-						   <li><a href="https://sites.google.com/view/sandeepkr/teaching/ell-888-advanced-machine-learning" title="" target="_blank">Course Webpage</a></li>
-
-	   					<p>Jan 2022 - Present</p>
-	   				</div>
-
-	   				<div class="timeline-content">
-	   					<h4>School of Artificial Intelligence</h4>
-						<p>The goal of this course is to train students with foundational concepts and skills in Machine Learning for high-dimensional, big data, non-Euclidean, irregular, and geometric data problems. The theory will go in conjunction with hands-on analysis of real-world applications, including ML, networks, learning, computer vision, bioinformatics, controls, etc. ​In the first part, mathematics for machine learning and learnability will be discussed. In the second part, machine learning techniques for high-dimensional and big data problems will be covered. The third part will introduce the rapidly evolving area of Geometric Machine Learning.</p>
-					</div>
-
-	   			</div> <!-- /timeline-block -->
-				
-				
-
-
-
-
-
-
-
-
-
-				   <div class="timeline-block">
-
-					<div class="timeline-ico">
-						<i class="fa fa-briefcase"></i>
-					</div>
-
-					<div class="timeline-header">
-						<h3>Teaching Assistant - ELL409: Machine Intelligence and Learning</h3>
-						<li><a href="https://web.iitd.ac.in/~sumeet/ell409_19.html" title="" target="_blank">Course Webpage</a></li>
-
-						<p> Aug 2021 - Dec 2021</p>
-					</div>
-
-					<div class="timeline-content">
-						<h4>School of Artificial Intelligence</h4>
-
-						<p>
-							This course will present the fundamental concepts and methodologies underlying intelligent computer system design. Specific emphasis will be placed on the paradigm of statistical and decision-theoretic modelling. This course contains a large amount of programming and mathematics because these subjects are fundamental to contemporary AI.
-
-						</p>
-					</div>
-
-				</div> <!-- /timeline-block -->
-
-
-
-
-
-
-				<div class="timeline-block">
-
-					<div class="timeline-ico">
-						<i class="fa fa-briefcase"></i>
-					</div>
-
-					<div class="timeline-header">
-						<h3>Assistant Professor - Artificial Intelligence</h3>
-						<li><a href="https://www.srmup.in/dcpage.aspx?dmpgid=4&dpgidtrail=4&mpgid=3&pgidtrail=33&deptid=1" title="" target="_blank"></a>Reference</li>
-
-						<p> Jan 2021 - Aug 2021</p>
-					</div>
-
-					<div class="timeline-content">
-						<h4>SRM Institute of Science and Technology</h4>
-
-						<p>Taught courses in AI, Deep Learning, Python programming, Data Analytics and Professional skills to both undergraduate and graduate students.
-						</p>
-						<p>University representative for Social Media.</p>
-						<p>Headed the alumni relation team, created the website for the same.</p>
-
-						<p>Judge for Hackathon 2021.</p>
-						<p>Chair panels at professional conferences and present academic papers.</p>
-
-					</div>
-
-				</div> <!-- /timeline-block -->
-			 
-			 
-
-
-
-				<div class="timeline-block">
-
-					<div class="timeline-ico">
-						<i class="fa fa-briefcase"></i>
-					</div>
-
-					<div class="timeline-header">
-						<h3>Solution Delivery Analyst</h3>
-
-						<p> Aug 2019 - Jan 2021</p>
-					</div>
-
-					<div class="timeline-content">
-						<h4>Deloitte USI - Risk and Financial Advisory</h4>
-
-						<p>Obtained hands-on exposure to SAP security components such as ERP Central Component 6.0 (ECC), Business Intelligence (BI), Supply Chain Management (SCM), CRM (Customer Relationship Management).</p>
-						<p>Worked as a part of large-scale projects which include security maintenance, administration and operations for various SAP environments.</p>
-						<p>Headed the alumni relation team, created the website for the same.</p>
-
-						<p>Experienced in preparing detailed documents and reports while managing complex internal and external data analysis responsibilities.
-						</p>
-						<p>Obtained people and project management skills.</p>
-
-					</div>
-
-				</div> <!-- /timeline-block -->
-
-
-
-
-				<div class="timeline-block">
-
-					<div class="timeline-ico">
-						<i class="fa fa-briefcase"></i>
-					</div>
-
-					<div class="timeline-header">
-						<h3>Data Science and Statistical Expert</h3>
-
-						<p> Jan 2019 - Aug 2019</p>
-					</div>
-
-					<div class="timeline-content">
-						<h4>Election Commission of India</h4>
-
-						<p>Performed Statistical analysis and data visualisation for Lok Sabha Election - 2019 Designing data acquisition trials Assessing results and analysing trends and using statistics to make forecasts and to provide projected figures</p>
-						<p>
-							Application of sampling techniques or utilise complete enumeration bases in order to determine and define groups to be surveyed.
-						</p>
-						<p>
-							Application of statistical methodology to complex data and acting in a consultancy capacity Designing and implementing data gathering/management computer systems and software
-						</p>
-					</div>
-
-				</div> <!-- /timeline-block -->
-
-
-
-
-
-
-
-				<div class="timeline-block">
-
-					<div class="timeline-ico">
-						<i class="fa fa-briefcase"></i>
-					</div>
-
-					<div class="timeline-header">
-						<h3>Data Science Research Associate</h3>
-
-						<p> Aug 2018 - Jan 2019</p>
-					</div>
-
-					<div class="timeline-content">
-						<h4>Reserve Bank of India, Strategic Research Unit</h4>
-						<p>Contributed analytical inputs to the Monetary Policy Committee by investigating weekly trend on Agmarket data, monthly data on IIP Index, Service indicators, PMI index, Unemployment data, Consumer Pyramid Data for the bi-monthly Monetary Policy Statement. Research, document, rate, or select alternatives for Financial Data Analysis algorithms or technologies.</p>
-						<p>Monitor developments in the fields of industrial technology, business, finance, and economic theory. Interpret data on price, yield, stability, future investment-risk trends, economic influences, and other factors affecting investment programs.</p>
-
-						<p>Evaluate financial reporting systems, accounting or collection procedures, or investment activities and make recommendations for changes to procedures, operating systems, budgets, or other financial control functions
-						</p>
-
-					</div>
-
-				</div> <!-- /timeline-block -->
-
-
-
-
-
-
-
-
-   			</div> <!-- /timeline-wrap -->   			
-
-   		</div> <!-- /col-twelve -->
-   		
-   	</div> <!-- /resume-timeline -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</div> <!-- /section-intro--> 
-
-<div class="row resume-timeline">
-
-	<div class="col-twelve resume-header">
-
-		<h2>Certifications</h2>
-
-	</div> <!-- /resume-header -->
-
-	<div class="col-twelve">
-
-		<div class="timeline-wrap">
-
-			<div class="timeline-block">
-	
-				<div class="timeline-ico">
-					<i class="fa fa-graduation-cap"></i>
-				</div>
-
-				<div class="timeline-header">
-					<h3>Computer Vision Masterclass							</h3>
-					<li><a href="./Certificates/ComputerVision.pdf" title="" target="_blank">Certificate</a></li>
-			
-				</div>
-
-				<div class="timeline-content">
-					<h4>Udemy</h4>
-					<p>Detect faces in images and videos using OpenCV and Dlib libraries
-						<p>Learn how to train the LBPH algorithm to recognize faces</p>
-						<p>Track objects in videos using KCF and CSRT algorithms</p>
-						<p>Learn the whole theory behind artificial neural networks and implement them to classify images</p>
-						<p>Implement convolutional neural networks to classify images</p>
-						<p>Use transfer learning and fine tuning to improve the results of convolutional neural networks</p>
-						<p>Detect emotions in images and videos using neural networks</p>
-						<p>Detect objects using YOLO, one of the most powerful techniques for this task</p>
-						<p>Recognize gestures and actions in videos using OpenCV</p>
-						<p>Create images that don't exist in the real world with GANs (Generative Adversarial Networks)</p>
-				</div>
-
-			</div> <!-- /timeline-block -->
-
-
-
-		<div class="timeline-block">
-
-			<div class="timeline-ico">
-				<i class="fa fa-graduation-cap"></i>
-			</div>
-
-			<div class="timeline-header">
-				<h3>Machine Learning  A-Z™ : Hands-On Python & R In Data Science</h3>
-				<li><a href="./Certificates/Machine Learning A-Z.pdf" title="" target="_blank">Certificate</a></li>
-		
-			</div>
-
-			<div class="timeline-content">
-				<h4>Udemy</h4>
-				<p>Part 1 - Data Preprocessing</p>
-				<p>Part 2 - Regression: Simple Linear Regression, Multiple Linear Regression, Polynomial Regression, SVR, Decision Tree Regression, Random Forest Regression</p>
-				<p>Part 3 - Classification: Logistic Regression, K-NN, SVM, Kernel SVM, Naive Bayes, Decision Tree Classification, Random Forest Classification</p>
-				<p>Part 4 - Clustering: K-Means, Hierarchical Clustering</p>
-				<p>Part 5 - Association Rule Learning: Apriori, Eclat</p>
-				<p>Part 6 - Reinforcement Learning: Upper Confidence Bound, Thompson Sampling</p>
-				<p>Part 7 - Natural Language Processing: Bag-of-words model and algorithms for NLP</p>
-				<p>Part 8 - Deep Learning: Artificial Neural Networks, Convolutional Neural Networks</p>
-				<p>Part 9 - Dimensionality Reduction: PCA, LDA, Kernel PCA</p>
-				<p>Part 10 - Model Selection & Boosting: k-fold Cross Validation, Parameter Tuning, Grid Search, XGBoost</p>
-			</div>
-
-		</div> <!-- /timeline-block -->
-
-
-
-
-
-		<div class="timeline-block">
-
-			<div class="timeline-ico">
-				<i class="fa fa-graduation-cap"></i>
-			</div>
-
-			<div class="timeline-header">
-				<h3>Scrapy: Powerful Web Scraping & Crawling with Python				</h3>
-				<li><a href="./Certificates/scrapy.pdf" title="" target="_blank">Certificate</a></li>
-		
-			</div>
-
-			<div class="timeline-content">
-				<h4>Udemy</h4>
-				
-
-
-
-
-
-				<p>Creating a web crawler in Scrapy</p>
-				<p>Crawling a single or multiple pages and scrape data</p>
-				<p>Deploying & Scheduling Spiders to ScrapingHub</p>
-				<p>Logging into Websites with Scrapy				</p>
-				<p>Running Scrapy as a Standalone Script				</p>
-				<p>Integrating Splash with Scrapy to scrape JavaScript rendered websites</p>
-				<p>Using Scrapy with Selenium in Special Cases, e.g. to Scrape JavaScript Driven Web Pages</p>
-				<p>Building Scrapy Advanced Spider</p>
-				<p>Storing data extracted by Scrapy into MySQL and MongoDB databases</p>
-				<p>Several real-life web scraping projects, including Craigslist, LinkedIn and many others</p>
-			</div>
-
-		</div> <!-- /timeline-block -->
-
-
-		<div class="timeline-block">
-
-			<div class="timeline-ico">
-				<i class="fa fa-graduation-cap"></i>
-			</div>
-
-			<div class="timeline-header">
-				<h3>Complete Guide to TensorFlow for Deep Learning with Python				</h3>
-				<li><a href="./Certificates/Complete Guide to TensorFlow.pdf" title="" target="_blank">Certificate</a></li>
-		
-			</div>
-
-			<div class="timeline-content">
-				<h4>Udemy</h4>
-				
-
-
-Topis covered :
-				Neural Network, 
-				TensorFlow,
-				Artificial Neural Networks,
-				Densely Connected Networks,
-				Convolutional Neural Networks,
-				Recurrent Neural Networks,
-				AutoEncoders,
-				Reinforcement Learning and
-				OpenAI Gym
-
-			</div>
-
-
-			<div class="timeline-block">
-
-				<div class="timeline-ico">
-					<i class="fa fa-graduation-cap"></i>
-				</div>
-	
-				<div class="timeline-header">
-					<h3>Data Science A-Z™: Real-Life Data Science					</h3>
-					<li><a href="./Certificates/ Data Science .pdf" title="" target="_blank">Certificate</a></li>
-			
-				</div>
-	
-				<div class="timeline-content">
-					<h4>Udemy</h4>
-					
-	
-	
-					In this course I did  develop a good understanding of the following tools:
-					SQL,
-					SSIS,
-					Tableau, and
-					Gretl.
-					<p>The topics that intrigued me most included :</p>
-					<p>Creating a Robust Geodemographic Segmentation Model</p>
-					<p>Performing Data Mining in Tableau</p>
-					<p>Using Backward Elimination, Forward Selection, and Bidirectional Elimination methods to create statistical models</p>
-					<p>Applying the Cumulative Accuracy Profile (CAP) to assess models</p>
-					<p>Understanding the intuition of multicollinearity</p>
-					<p>Applying three levels of model maintenance to prevent model deterioration</p>
-	
-				</div>
-
-
-
-
-				
-			<div class="timeline-block">
-
-				<div class="timeline-ico">
-					<i class="fa fa-graduation-cap"></i>
-				</div>
-	
-				<div class="timeline-header">
-					<h3>Deep Learning A-Z™: Hands-On Artificial Neural Networks				</h3>
-					<li><a href="./Certificates/Deep Learning.pdf" title="" target="_blank">Certificate</a></li>
-			
-				</div>
-	
-				<div class="timeline-content">
-					<h4>Udemy</h4>
-					
-					<p>Artificial Neural Networks to solve a Customer Churn problem</p>
-					<p>Convolutional Neural Networks for Image Recognition</p>
-					<p>Recurrent Neural Networks to predict Stock Prices					</p>
-					<p>Self-Organizing Maps to investigate Fraud</p>
-					<p>Boltzmann Machines to create a Recomender System</p>
-					<p>Stacked Autoencoders* to take on the challenge for the Netflix $1 Million prize</p>
-	
-				</div>
-
-
-
-
-				<div class="timeline-block">
-
-					<div class="timeline-ico">
-						<i class="fa fa-graduation-cap"></i>
-					</div>
-		
-					<div class="timeline-header">
-						<h3>2022 Complete Python Bootcamp 						</h3>
-						<li><a href="./Certificates/2022 Complete Python Bootcamp .pdf" title="" target="_blank">Certificate</a></li>
-				
-					</div>
-		
-					<div class="timeline-content">
-						<h4>Udemy</h4>
-						
-						The program was designed to build a portfolio of 100 projects, including:
-						Blackjack, Snake Game
-						, Pong Game 
-						, Auto Swipe on Tinder 
-						, Auto Job Applications on LinkedIn 
-						, Automate Birthday Emails/SMS 
-						, Fully Fledged Blog Website 
-						, Build Your Own Public API 
-						, Data Science with Google Trends 
-						, Analysing Lego Datasets 
-						, Google App Store Analysis 
-						and more.
-								
-					</div>
-
-
-
-
-					<div class="timeline-block">
-
-						<div class="timeline-ico">
-							<i class="fa fa-graduation-cap"></i>
-						</div>
-			
-						<div class="timeline-header">
-							<h3>Python for Data Science and Machine Learning Bootcamp							</h3>
-							<li><a href="./Certificates/Python.pdf" title="" target="_blank">Certificate</a></li>
-					
-						</div>
-			
-						<div class="timeline-content">
-							<h4>Udemy</h4>
-							
-							<p>NumPy for Numerical Data, Matplotlib for Python Plotting and Pandas for Data Analysis</p>
-							<p>Natural Language Processing and Spam Filters</p>
-							<p>Plotly for interactive dynamic visualizations</p>
-							<p>Support Vector Machines</p>
-							<p>Seaborn for statistical plots</p>
-			
-						</div>
-
-
-						<div class="timeline-block">
-
-							<div class="timeline-ico">
-								<i class="fa fa-graduation-cap"></i>
-							</div>
-				
-							<div class="timeline-header">
-								<h3>Tableau 2020 A-Z: Hands-On Tableau Training for Data Science</h3>
-								<li><a href="./Certificates/Tableau.pdf" title="" target="_blank">Certificate</a></li>
-						
-							</div>
-				
-							<div class="timeline-content">
-								<h4>Udemy</h4>
-								<p>The program covered most advanced features of data preparation in Tableau 10, where we did create table calculations, treemap charts, and storylines. We learned to tackle how to use aggregations to summarize information and also use granularity to ensure accurate calculations.</p>
-								<p>This course fully prepared me to collect, examine, and present data for any purpose, whether working with scientific data or I want to make forecasts about buying trends to increase profits.</p>
-				
-							</div>
-
-
-
-							
-						<div class="timeline-block">
-
-							<div class="timeline-ico">
-								<i class="fa fa-graduation-cap"></i>
-							</div>
-				
-							<div class="timeline-header">
-								<h3>SAP Security Training								</h3>
-								<li><a href="./Certificates/SAP.pdf" title="" target="_blank">Certificate</a></li>
-						
-							</div>
-				
-							<div class="timeline-content">
-								<h4>Udemy</h4>
-								<p>
-									I completed this program during the training period of my work at Deloitte USI, working as SAP Secruity Consultant with 3M.
-								</p>
-								<p>It empowered me in the concepts of SAP Security and Authorizations.</p>
-							</div>
-						
-
-
-							<div class="timeline-block">
-
-								<div class="timeline-ico">
-									<i class="fa fa-graduation-cap"></i>
-								</div>
-					
-								<div class="timeline-header">
-									<h3>Data Science Cybersecuity Implementation</h3>
-									<li><a href="./Certificates/Data Science Cybersecuity Implementation.pdf" title="" target="_blank">Certificate</a></li>
-							
-								</div>
-					
-								<div class="timeline-content">
-									<h4>Udemy</h4>
-									<p>Statistics - Machine Learning : Central Tendency, Measures Dispersion, Confusion Matrix, Accuracy and Kappa</p>
-									<p>Introduction to Payment Fraud and Machine Learning in Payment Fraud</p>
-									<p>Machine Learning in Malware and Phishing</p>
-									<p>Machine Learning in Spam</p>
-									<p>Machine Learning in Twitter Bot Detector</p>
-									<p>Machine Learning in Medical Fraud Detection</p>
-								</div>
-
-
-			</div> <!-- /timeline-block -->
-	
-
-
-
-
-
-		</div> <!-- /timeline-block -->
-
-		</div> <!-- /timeline-wrap -->   			
-
-	</div> <!-- /col-twelve -->
-	
-</div> <!-- /resume-timeline -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	   
-   	
-   	<div class="row resume-timeline">
-
-   		<div class="col-twelve resume-header">
-
-   			<h2>Education</h2>
-
-   		</div> <!-- /resume-header -->
-
-   		<div class="col-twelve">
-
-   			<div class="timeline-wrap">
-			   
-				<div class="timeline-wrap">
-			   
-					<div class="timeline-block">
-
-						<div class="timeline-ico">
-							<i class="fa fa-graduation-cap"></i>
-						</div>
- 
-						<div class="timeline-header">
-							<h3>Doctor of Philosophy</h3>
-							<p>Aug 20121 - Present</p>
-						</div>
- 
-						<div class="timeline-content">
-							<h4> School of Artificial Intelligence (ScAI), IIT Delhi</h4>
-						 <p>Doctor of Philosophy - Artificial Intelligence</p>
-						 <p>Research interest : Cognitive psychology and computational linguistics </p>
-						 <p>Courses completed: Mathematical Foundations of Computer Technology, Data Mining, Advanced Machine Learning, Special Topics in Computer Applications - Social Computing, Research Writing</p>
-						 <p>C.G.P.A. - 8.5</p>
-						 
-					 </div>
-
-
-					
-
-	   			<div class="timeline-block">
-
-	   				<div class="timeline-ico">
-	   					<i class="fa fa-graduation-cap"></i>
-	   				</div>
-
-	   				<div class="timeline-header">
-	   					<h3>Master of Technology</h3>
-	   					<p>July 2017 - June 2019</p>
-	   				</div>
-
-	   				<div class="timeline-content">
-	   					<h4> Jaypee Institute of Information Technology</h4>
-						<p>Master of Technology - Data Analytics</p>
-						<p>Courses: Parallel and distributed databases, Machine learning and data mining, Cloud based big data systems, Data science programming, Design innovation and incubation, Large scale graph algorithms and analytics, Deep Learning,Emperical research and performance, Information integration and visualisation</p>
-						<p>C.G.P.A. - 7.6</p>
-					</div>
-
-	   			</div> <!-- /timeline-block -->
-
-	   			<div class="timeline-block">
-
-	   				<div class="timeline-ico">
-	   					<i class="fa fa-graduation-cap"></i>
-	   				</div>
-
-	   				<div class="timeline-header">
-	   					<h3>Bachelor of Technology (BTech)</h3>
-	   					<p>May 2013 - June 2017</p>
-	   				</div>
-
-	   				<div class="timeline-content">
-	   					<h4>Pune University : Pune Institute of Computer Technology</h4>
-
-	   					<p>Bachelor of Engineering - Computer Science</p>
-	   				</div>
-
-	   			</div> <!-- /timeline-block -->
-
-   			</div> <!-- /timeline-wrap -->   			
-
-   		</div> <!-- /col-twelve -->
-   		
-   	</div> <!-- /resume-timeline -->
-		
-	</section> <!-- /features -->
-	
-   <!-- contact
-   ================================================== -->
-   <section id="contact">
-
-	
-   		
-   	</div> <!-- /contact-form -->
-
-   	<div class="row contact-info">
-
-   		<div class="col-four tab-full">
-
-   			<div class="icon">
-   				<i class="icon-pin"></i>
-   			</div>
-
-   			<h5>Where to find me</h5>
-
-   			<p>
-				Yardi School of Artificial Intelligence (ScAI)<br>
-				Room 402, School of IT Building
-				Indian Institute of Technology Delhi
-				Hauz Khas, New Delhi, 110016, India
-            </p>
-
-   		</div>
-
-   		<div class="col-four tab-full collapse">
-			<a href="mailto:ritika291195@icloud.com">
-   			<div class="icon">
-   				<i class="icon-mail"></i>
-   			</div>
-   			<h5>Email Me At</h5>
-			   ritika291195@icloud.com</a><br>	     
-			   </p>
-
-   		</div>
-
-   		<div class="col-four tab-full">
-
-   			<div class="icon">
-   				<i class="icon-phone"></i>
-   			</div>
-
-   			<h5>Call Me At</h5>
-
-   			<p>Phone: on request<br>
-			   </p>
-
-   		</div>
-   		
-   	</div> <!-- /contact-info -->
-		
-	</section> <!-- /contact -->
-
-
-   <!-- footer
-   ================================================== -->
-
-   <footer>
-		<div class="row">
-
-			<div class="col-six tab-full pull-right social">
-
-				<ul class="footer-social">        
-				 <li><a href="https://www.linkedin.com/in/ritika-singh-90ba66114/"><i class="fa fa-linkedin"></i></a></li>
-				 <li><a href="https://github.com/ritikasingh95"><i class="fa fa-github"></i></a></li>
-				 <li><a href="https://www.instagram.com/olive_to_popeye/"><i class="fa fa-instagram"></i></a></li>
-			  </ul> 
-				 
-		 </div>
-
-		
-
-		 </div> <!-- /row -->     	
-  </footer>  
-
-  <div id="preloader"> 
-	   <div id="loader"></div>
-  </div> 
-
-  <!-- Java Script
-  ================================================== --> 
-  <script src="js/jquery-2.1.3.min.js"></script>
-  <script src="js/plugins.js"></script>
-  <script src="js/main.js"></script>
-
-</body>
-
-</html>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<nav>
+  <div class="nav-logo">Ritika Singh</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#publications">Research</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#certificates">Certificates</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li>
+      <a href="Documents/CV.pdf" download class="nav-cv-btn">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        CV
+      </a>
+    </li>
+  </ul>
+</nav>
+
+<section id="hero">
+  <div class="hero-left">
+    <div class="hero-tag">Ph.D. Researcher · IIT Delhi</div>
+    <h1>Ritika<br><em>Singh</em></h1>
+    <p class="hero-desc">I build probabilistic models that reveal the hidden processes behind health inequalities — turning noisy, incomplete data into interpretable insights that matter.</p>
+    <div class="hero-cta">
+      <a href="#publications" class="btn-primary">View Research →</a>
+      <a href="Documents/CV.pdf" download class="btn-secondary">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download CV
+      </a>
+      <a href="/cdn-cgi/l/email-protection#64160d100d0f05565d55555d51240d07080b11004a070b09" class="btn-accent">Get in Touch</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="stat-card"><div class="stat-number">4+</div><div class="stat-label">Published Papers</div></div>
+    <div class="stat-card"><div class="stat-number">3</div><div class="stat-label">International Awards</div></div>
+    <div class="stat-card"><div class="stat-number">5+</div><div class="stat-label">Years Research Exp.</div></div>
+    <div class="stat-card"><div class="stat-number">LMIC</div><div class="stat-label">Research Focus</div></div>
+  </div>
+  <div class="hero-bg-text">RS</div>
+</section>
+
+<section id="about">
+  <div class="section-header"><span class="section-num">01 —</span><h2>Research Focus</h2></div>
+  <div class="about-grid">
+    <div class="about-text">
+      <p>Learning interpretable latent structure from noisy, heterogeneous, and spatially evolving data — to understand and address unequal health and developmental outcomes.</p>
+      <p>My doctoral research develops probabilistic, spatial-temporal, and machine-learning models that infer unobserved processes — access, engagement, risk, developmental vulnerability — from large-scale observational data across low and middle-income countries.</p>
+      <p>A defining feature of my work is treating latent variable modeling as a tool for substantive inference, not merely dimensionality reduction. Observed outcomes are modeled as consequences of underlying processes shaped by social, structural, and contextual factors.</p>
+      <p>Going forward, I aim to extend this into deep latent dynamical models that infer meaningful states from irregular, multimodal data streams — preserving interpretability and uncertainty-awareness throughout.</p>
+    </div>
+    <ul class="interest-list">
+      <li>Bayesian Latent Variable Modeling</li>
+      <li>Spatial &amp; Spatiotemporal Statistics</li>
+      <li>Interpretable Machine Learning</li>
+      <li>Computational Social Science</li>
+      <li>Immunization &amp; Global Health Equity</li>
+      <li>Early Childhood Development</li>
+      <li>Probabilistic Deep Learning</li>
+      <li>Causal Inference from Observational Data</li>
+    </ul>
+  </div>
+</section>
+
+<section id="publications">
+  <div class="section-header"><span class="section-num">02 —</span><h2>Publications</h2></div>
+  <div class="pub-list reveal">
+
+    <div class="pub-item">
+      <div class="pub-year">2025</div>
+      <div class="pub-details">
+        <h3>Bridging the Immunization Gap: Predictive Models for Zero-Dose and Vaccination Dropout in India</h3>
+        <div class="pub-meta">Ritika Singh, Mira Johri, Sumeet Agarwal</div>
+        <span class="pub-venue">ACM COMPASS 2025</span>
+        <a href="https://dl.acm.org/doi/proceedings/10.1145/3689904" target="_blank" class="pub-link">ACM ↗</a>
+        <a href="Documents/Publications/Bridging the Immunization Gap.pdf" target="_blank" class="pub-link">PDF ↗</a>
+      </div>
+      <div class="pub-type">Full Paper</div>
+    </div>
+
+    <div class="pub-item">
+      <div class="pub-year">2024</div>
+      <div class="pub-details">
+        <h3>Quantifying the Role of Maternal Recall in Estimates of Routine Immunisation Rates in India: A Large-Scale Sub-National Bayesian Modelling Study</h3>
+        <div class="pub-meta">Ritika Singh, Alexandre de Figueiredo, Sumeet Agarwal, Misha Mishra, Devyani Agarwal</div>
+        <span class="pub-venue">ACM COMPASS 2024</span>
+        <a href="https://dl.acm.org/doi/proceedings/10.1145/3674399" target="_blank" class="pub-link">ACM ↗</a>
+        <a href="Documents/Publications/Quantifying the role of maternal recall.pdf" target="_blank" class="pub-link">PDF ↗</a>
+      </div>
+      <div class="pub-type">Full Paper</div>
+    </div>
+
+    <div class="pub-item">
+      <div class="pub-year">2024</div>
+      <div class="pub-details">
+        <h3>Predictive Modelling of Zero-Dose Children and Vaccination Dropout in India Reveals Common Drivers of Immunisation Shortfalls</h3>
+        <div class="pub-meta">Ritika Singh, E. Spandana, Mira Johri, Sumeet Agarwal</div>
+        <span class="pub-venue">Gavi Zero-Dose Learning Week</span>
+      </div>
+      <div class="pub-type">Poster</div>
+    </div>
+
+    <div class="pub-item">
+      <div class="pub-year">2023</div>
+      <div class="pub-details">
+        <h3>Exploring Multimorbidity and Patterns of Long-Term Conditions in England Using Open Prescription and Primary Care Data</h3>
+        <div class="pub-meta">Ritika Singh, Data Study Group Team</div>
+        <span class="pub-venue">The Alan Turing Institute</span>
+        <a href="https://www.turing.ac.uk/research/publications" target="_blank" class="pub-link">Report ↗</a>
+      </div>
+      <div class="pub-type">Data Study</div>
+    </div>
+
+    <div class="pub-item">
+      <div class="pub-year">2019</div>
+      <div class="pub-details">
+        <h3>M.Tech Thesis</h3>
+        <div class="pub-meta">Ritika Singh · JIIT Noida</div>
+        <span class="pub-venue">Master's Thesis · Data Analytics</span>
+        <a href="Documents/Publications/MtechThesis.pdf" target="_blank" class="pub-link">PDF ↗</a>
+        <a href="Documents/MtechThesis.pdf" target="_blank" class="pub-link" style="display:none"></a>
+      </div>
+      <div class="pub-type">Thesis</div>
+    </div>
+
+  </div>
+</section>
+
+<section id="projects">
+  <div class="section-header"><span class="section-num">03 —</span><h2>Projects</h2></div>
+  <div class="projects-grid">
+    <div class="project-card reveal" data-num="01">
+      <div class="project-tag">Ongoing · Immunisation</div>
+      <h3>Understanding Inference in Immunisation Attitudes</h3>
+      <p>Multi-country study on how socioeconomic factors shape vaccine trust and behavior. Latent variable models decompose demand from access barriers across diverse national contexts.</p>
+      <div class="project-techs"><span class="tech-tag">IRT Models</span><span class="tech-tag">Hierarchical Bayesian</span><span class="tech-tag">R / Stan</span><span class="tech-tag">Survey Analysis</span></div>
+    </div>
+    <div class="project-card reveal" data-num="02">
+      <div class="project-tag">Completed · ECD</div>
+      <h3>Early Childhood Development in Rural Uttar Pradesh</h3>
+      <p>ML models identifying determinants of developmental variation in rural India, including active participation in contextual adaptation of ECDI survey instruments for village settings.</p>
+      <div class="project-techs"><span class="tech-tag">Random Forest</span><span class="tech-tag">XGBoost</span><span class="tech-tag">Construct Validity</span><span class="tech-tag">Python</span></div>
+    </div>
+    <div class="project-card reveal" data-num="03">
+      <div class="project-tag">Completed · Immunisation</div>
+      <h3>Zero-Dose Prediction Using ML</h3>
+      <p>Predictive models for early identification of zero-dose children across the immunisation cascade, explicitly separating model performance from substantive interpretation.</p>
+      <div class="project-techs"><span class="tech-tag">Cascade Analysis</span><span class="tech-tag">SHAP</span><span class="tech-tag">Region-Specific Models</span><span class="tech-tag">Python</span></div>
+    </div>
+    <div class="project-card reveal" data-num="04">
+      <div class="project-tag">Completed · Spatial</div>
+      <h3>Geo-Spatial Modelling of Vaccine Coverage</h3>
+      <p>Sub-national Bayesian spatial analysis identifying vaccination coldspots in India using SPDE via INLA, modeling spatial dependence, regional heterogeneity, and measurement uncertainty.</p>
+      <div class="project-techs"><span class="tech-tag">INLA / SPDE</span><span class="tech-tag">spGLM</span><span class="tech-tag">qGIS</span><span class="tech-tag">R</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="section-header"><span class="section-num">04 —</span><h2>Experience</h2></div>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-period">Aug 2021 – Present</div>
+      <h3>Ph.D. Researcher &amp; Teaching Assistant</h3>
+      <div class="timeline-org">IIT Delhi · School of AI</div>
+      <p class="timeline-desc">Doctoral research on latent variable modeling for health equity. TA for Advanced Machine Learning, Bayesian Modelling, and Machine Learning. TCS Research Scholar Fellow (2023–2027).</p>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-period">May – Jul 2025</div>
+      <h3>Globalink Research Scholar</h3>
+      <div class="timeline-org">Université de Montréal · Canada</div>
+      <p class="timeline-desc">Mitacs Globalink Research Award. International research collaboration on immunisation modeling and health equity.</p>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-period">Aug 2025</div>
+      <h3>Delegate — 30th AFS Youth Assembly</h3>
+      <div class="timeline-org">AstraZeneca Young Health Programme</div>
+      <p class="timeline-desc">Selected as a YHP Changemaker Scholar, representing global health research and advocacy.</p>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-period">Nov 2023</div>
+      <h3>Workshop Participant</h3>
+      <div class="timeline-org">UN &amp; SIPRI · Responsible AI for Peace and Security</div>
+      <p class="timeline-desc">International dialogue on responsible AI governance in peace and security contexts.</p>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-period">Mar 2023</div>
+      <h3>Data Study Group</h3>
+      <div class="timeline-org">The Alan Turing Institute · London</div>
+      <p class="timeline-desc">Collaborative data science challenge on multimorbidity and long-term conditions in England using NHS open data.</p>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-period">Jan – Aug 2021</div>
+      <h3>Assistant Professor – Artificial Intelligence</h3>
+      <div class="timeline-org">SRM Institute of Science and Technology</div>
+      <p class="timeline-desc">Taught undergraduate AI and data science courses.</p>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-period">Aug 2019 – Jan 2021</div>
+      <h3>Solution Delivery Analyst</h3>
+      <div class="timeline-org">Deloitte USI · Risk and Financial Advisory</div>
+      <p class="timeline-desc">Risk and financial analytics in enterprise consulting, delivering data-driven solutions for large-scale clients.</p>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-period">Jan – Aug 2019</div>
+      <h3>Data Science &amp; Statistical Expert</h3>
+      <div class="timeline-org">Election Commission of India</div>
+      <p class="timeline-desc">Live streaming dashboards and statistical pipelines for the 2019 Lok Sabha General Election using ARIMA, LSTM, and Tableau.</p>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-period">Aug – Jan 2019</div>
+      <h3>Data Science Research Associate</h3>
+      <div class="timeline-org">Reserve Bank of India · Strategic Research Unit</div>
+      <p class="timeline-desc">Research on Bhavantar Bhugtan Yojana and mobile banking adoption using statistical modeling.</p>
+    </div>
+  </div>
+</section>
+
+<section id="awards">
+  <div class="section-header"><span class="section-num">05 —</span><h2>Awards &amp; Recognition</h2></div>
+  <div class="awards-grid">
+    <div class="award-card reveal">
+      <div class="award-icon">🏆</div>
+      <h3>TCS Research Scholar Fellowship</h3>
+      <p>2023 – 2027 · Competitive fellowship from Tata Consultancy Services for doctoral research excellence</p>
+    </div>
+    <div class="award-card reveal">
+      <div class="award-icon">🌐</div>
+      <h3>Mitacs Globalink Research Award</h3>
+      <p>2024 – 2025 · International research award for collaboration at Université de Montréal, Canada</p>
+    </div>
+    <div class="award-card reveal">
+      <div class="award-icon">🌱</div>
+      <h3>AstraZeneca YHP Changemaker Scholar</h3>
+      <p>2025 · Young Health Programme — delegate to the 30th AFS Youth Assembly</p>
+    </div>
+  </div>
+</section>
+
+<!-- CERTIFICATES SECTION -->
+<section id="certificates">
+  <div class="section-header"><span class="section-num">06 —</span><h2>Certificates &amp; Credentials</h2></div>
+  <p class="certs-intro">Professional certifications, training programmes, and credentials earned alongside doctoral research. Click any card to open the certificate.</p>
+  <div class="certs-grid">
+    <a href="Certificates/Data Science .pdf" class="cert-card reveal" target="_blank">
+      <div class="cert-icon">📊</div>
+      <div class="cert-name">Data Science</div>
+      <div class="cert-meta">Certificate of Completion</div>
+    </a>
+    <a href="Certificates/Machine Learning A-Z.pdf" class="cert-card reveal" target="_blank">
+      <div class="cert-icon">🤖</div>
+      <div class="cert-name">Machine Learning A–Z</div>
+      <div class="cert-meta">Certificate of Completion</div>
+    </a>
+    <a href="Certificates/Deep Learning.pdf" class="cert-card reveal" target="_blank">
+      <div class="cert-icon">🧠</div>
+      <div class="cert-name">Deep Learning</div>
+      <div class="cert-meta">Certificate of Completion</div>
+    </a>
+    <a href="Certificates/ComputerVision.pdf" class="cert-card reveal" target="_blank">
+      <div class="cert-icon">👁️</div>
+      <div class="cert-name">Computer Vision</div>
+      <div class="cert-meta">Certificate of Completion</div>
+    </a>
+    <a href="Certificates/Complete Guide to TensorFlow.pdf" class="cert-card reveal" target="_blank">
+      <div class="cert-icon">🔬</div>
+      <div class="cert-name">Complete Guide to TensorFlow</div>
+      <div class="cert-meta">Certificate of Completion</div>
+    </a>
+    <a href="Certificates/2022 Complete Python Bootcamp .pdf" class="cert-card reveal" target="_blank">
+      <div class="cert-icon">🐍</div>
+      <div class="cert-name">Complete Python Bootcamp 2022</div>
+      <div class="cert-meta">Certificate of Completion</div>
+    </a>
+    <a href="Certificates/Python.pdf" class="cert-card reveal" target="_blank">
+      <div class="cert-icon">💻</div>
+      <div class="cert-name">Python Programming</div>
+      <div class="cert-meta">Certificate of Completion</div>
+    </a>
+    <a href="Certificates/Tableau.pdf" class="cert-card reveal" target="_blank">
+      <div class="cert-icon">📈</div>
+      <div class="cert-name">Tableau</div>
+      <div class="cert-meta">Certificate of Completion</div>
+    </a>
+    <a href="Certificates/scrapy.pdf" class="cert-card reveal" target="_blank">
+      <div class="cert-icon">🕷️</div>
+      <div class="cert-name">Scrapy — Web Scraping</div>
+      <div class="cert-meta">Certificate of Completion</div>
+    </a>
+    <a href="Certificates/Data Science Cybersecuity Implementation.pdf" class="cert-card reveal" target="_blank">
+      <div class="cert-icon">🔐</div>
+      <div class="cert-name">Data Science &amp; Cybersecurity Implementation</div>
+      <div class="cert-meta">Certificate of Completion</div>
+    </a>
+    <a href="Certificates/SAP.pdf" class="cert-card reveal" target="_blank">
+      <div class="cert-icon">🏢</div>
+      <div class="cert-name">SAP</div>
+      <div class="cert-meta">Certificate of Completion</div>
+    </a>
+    <a href="Documents/CV.pdf" class="cert-card reveal" target="_blank">
+      <div class="cert-icon">📄</div>
+      <div class="cert-name">Full Curriculum Vitae</div>
+      <div class="cert-meta">Updated 2025 · PDF</div>
+    </a>
+  </div>
+</section>
+
+<!-- CV DOWNLOAD BANNER -->
+<div id="cv-download">
+  <div class="cv-download-text">
+    <h3>Want the full picture?</h3>
+    <p>Download my complete CV — publications, projects, teaching, and more.</p>
+  </div>
+  <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;">
+    <a href="Documents/CV.pdf" download class="cv-download-btn">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download CV (PDF)
+    </a>
+    <a href="Documents/ResearchSoFar.pdf" target="_blank" class="cv-download-btn" style="background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,0.5);">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Research Statement
+    </a>
+  </div>
+</div>
+
+<section id="skills">
+  <div class="section-header"><span class="section-num">07 —</span><h2>Skills &amp; Tools</h2></div>
+  <div class="skills-grid">
+    <div class="skill-group reveal">
+      <h3>Statistical Methods</h3>
+      <div class="skill-items">
+        <span class="skill-item">Bayesian Inference</span><span class="skill-item">INLA / SPDE</span><span class="skill-item">Item Response Theory</span><span class="skill-item">Latent Variable Models</span><span class="skill-item">spGLM</span><span class="skill-item">ARIMA / LSTM</span><span class="skill-item">SHAP / XAI</span><span class="skill-item">Gradient Boosting</span>
+      </div>
+    </div>
+    <div class="skill-group reveal">
+      <h3>Languages &amp; Libraries</h3>
+      <div class="skill-items">
+        <span class="skill-item">Python</span><span class="skill-item">R</span><span class="skill-item">Stan</span><span class="skill-item">PyMC</span><span class="skill-item">scikit-learn</span><span class="skill-item">pandas / numpy</span><span class="skill-item">SQL</span><span class="skill-item">PostgreSQL</span>
+      </div>
+    </div>
+    <div class="skill-group reveal">
+      <h3>Tools &amp; Platforms</h3>
+      <div class="skill-items">
+        <span class="skill-item">qGIS</span><span class="skill-item">Tableau</span><span class="skill-item">Git / GitHub</span><span class="skill-item">Android Studio</span><span class="skill-item">MySQL</span><span class="skill-item">SQLite</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <p style="font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;">08 — Let's Connect</p>
+  <h2 class="contact-big">Open to<br><em>opportunities.</em></h2>
+  <p style="color:var(--muted);max-width:500px;margin:0 auto 1rem;line-height:1.75;">Actively exploring postdoctoral and research scientist positions in Bayesian machine learning, health data science, and computational social science.</p>
+  <div class="contact-links">
+    <a href="/cdn-cgi/l/email-protection#d6a4bfa2bfbdb7e4efe7e7efe396bfb5bab9a3b2f8b5b9bb" class="contact-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>
+      <span class="__cf_email__" data-cfemail="13617a677a7872212a22222a26537a707f7c66773d707c7e">[email&#160;protected]</span>
+    </a>
+    <a href="https://www.linkedin.com/in/ritika-singh-" target="_blank" class="contact-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+      LinkedIn
+    </a>
+    <a href="https://github.com/ritikasingh95" target="_blank" class="contact-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+      GitHub
+    </a>
+    <a href="Documents/CV.pdf" download class="contact-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download CV
+    </a>
+    <a href="Documents/ResearchSoFar.pdf" target="_blank" class="contact-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Research Statement
+    </a>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 Ritika Singh · Ph.D. Candidate, IIT Delhi · <a href="https://github.com/ritikasingh95/ritikasingh95.github.io">ritikasingh95.github.io</a></p>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  const cursor = document.getElementById('cursor');
+  const cursorRing = document.getElementById('cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+  });
+  function animateRing() {
+    rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+    cursorRing.style.left = rx + 'px'; cursorRing.style.top = ry + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+  document.querySelectorAll('a, button, .project-card, .award-card, .skill-item, .cert-card').forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-grow'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-grow'));
+  });
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal, .timeline-item').forEach(el => observer.observe(el));
+
+  document.querySelectorAll('.pub-item').forEach((item, i) => {
+    item.style.opacity = '0';
+    item.style.transform = 'translateY(16px)
