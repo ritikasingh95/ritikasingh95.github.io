@@ -35,8 +35,14 @@
     <section class="card" id="mesh-lab">
       <h2>2) Interactive Mesh and Sensitivity Lab</h2>
       <p>Use this panel to interactively vary state, mesh granularity, model family, and maternal-recall regime. The mesh preview and metrics update in real time to show how uncertainty and fit move with each design choice.</p>
-      <p>The 0/1 vaccination point layer is generated from geolocated NFHS4 child records (cluster summary export in <code>data/cluster-vax-summary-nfhs4.json</code>).</p>
+      <p>The 0/1 vaccination point layer is generated from DHS birth-recode pipeline outputs (summary export in <code>data/cluster-vax-summary.json</code>).</p>
       <p>State boundaries are loaded from real GeoJSON shape files in <code>data/india-states/</code>.</p>
+      <ul>
+        <li>DHS birth recode input: <code>KidsRecode/IAKR7DFL.SAV</code> filtered to age 12-23 months and alive children.</li>
+        <li>Per-child 0/1 vaccination computed exactly as card-or-maternal-recall for each vaccine indicator.</li>
+        <li>Cluster GPS merge done via <code>DHSCLUST = ClusterID</code> from <code>ShapeFile/IAGE7AFL.shp</code>, then exported to <code>Cluster_data.csv</code>.</li>
+        <li>This page uses those generated <code>NFHS4_IndividualData.csv</code>/<code>NFHS5_IndividualData.csv</code> plus <code>Cluster_data.csv</code> to build cluster-level 0/1 summaries.</li>
+      </ul>
 
       <div class="lab-grid">
         <div class="lab-controls">
@@ -48,6 +54,13 @@
               <option value="Maharashtra">Maharashtra</option>
               <option value="Rajasthan">Rajasthan</option>
               <option value="Nagaland">Nagaland</option>
+            </select>
+          </label>
+
+          <label class="lab-label">Survey
+            <select id="surveySelect">
+              <option value="NFHS5">NFHS5 (2019-2021)</option>
+              <option value="NFHS4">NFHS4 (2015-2016)</option>
             </select>
           </label>
 
@@ -96,7 +109,7 @@
         <div class="lab-visual">
           <svg id="meshSvg" class="mesh-svg" viewBox="0 0 420 300" role="img" aria-label="Interactive geospatial mesh and cluster preview"></svg>
           <p class="lab-caption" id="labCaption"></p>
-          <p class="lab-caption"><strong>Point legend:</strong> green = vaccinated=1 majority in cluster, red = vaccinated=0 majority. Radius scales with cluster sample size.</p>
+          <p class="lab-caption"><strong>Point legend:</strong> green = vaccinated=1 majority in cluster, red = unvaccinated majority (vaccinated=0). Radius scales with cluster sample size.</p>
         </div>
       </div>
 
@@ -137,7 +150,7 @@
         <div class="metric-card">
           <p class="metric-label">Clusters (Actual Data)</p>
           <p class="metric-value" id="clusterCountVal">-</p>
-          <p class="metric-delta">NFHS4 geolocated clusters</p>
+          <p class="metric-delta">Selected survey geolocated clusters</p>
         </div>
         <div class="metric-card">
           <p class="metric-label">Children (n)</p>
@@ -145,12 +158,12 @@
           <p class="metric-delta">Selected state + vaccine</p>
         </div>
         <div class="metric-card">
-          <p class="metric-label">Vaccinated = 1</p>
+          <p class="metric-label">Vaccinated (Vaccinated=1)</p>
           <p class="metric-value" id="oneVal">-</p>
           <p class="metric-delta" id="oneShareVal">-</p>
         </div>
         <div class="metric-card">
-          <p class="metric-label">Vaccinated = 0</p>
+          <p class="metric-label">Unvaccinated (Vaccinated=0)</p>
           <p class="metric-value" id="zeroVal">-</p>
           <p class="metric-delta" id="zeroShareVal">-</p>
         </div>

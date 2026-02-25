@@ -40,9 +40,8 @@
     mr0: { rmse: 0.018, unc: 0.032, stability: -0.024, ppc: -0.015 }
   };
 
-  const stateProfiles = {
+  const knownStateProfiles = {
     "Uttar Pradesh": {
-      slug: "uttar-pradesh",
       seed: 13,
       color: "#c8522a",
       kmPerPx: 3.25,
@@ -50,7 +49,6 @@
       base: { rmse: 0.268, unc: 0.196, stability: 0.670, ppc: 0.890 }
     },
     "Bihar": {
-      slug: "bihar",
       seed: 19,
       color: "#a1462f",
       kmPerPx: 2.95,
@@ -58,7 +56,6 @@
       base: { rmse: 0.281, unc: 0.214, stability: 0.640, ppc: 0.872 }
     },
     "Assam": {
-      slug: "assam",
       seed: 29,
       color: "#a85f2a",
       kmPerPx: 2.45,
@@ -66,7 +63,6 @@
       base: { rmse: 0.297, unc: 0.236, stability: 0.600, ppc: 0.850 }
     },
     "Maharashtra": {
-      slug: "maharashtra",
       seed: 37,
       color: "#be6640",
       kmPerPx: 3.55,
@@ -74,7 +70,6 @@
       base: { rmse: 0.245, unc: 0.174, stability: 0.740, ppc: 0.910 }
     },
     "Rajasthan": {
-      slug: "rajasthan",
       seed: 43,
       color: "#b85a2f",
       kmPerPx: 4.05,
@@ -82,7 +77,6 @@
       base: { rmse: 0.257, unc: 0.183, stability: 0.720, ppc: 0.903 }
     },
     "Nagaland": {
-      slug: "nagaland",
       seed: 53,
       color: "#8f3f2a",
       kmPerPx: 2.05,
@@ -93,6 +87,7 @@
 
   const baselineInputs = {
     state: "Uttar Pradesh",
+    survey: "NFHS5",
     model: "inla",
     mr: "mr1",
     vaccine: "MCV1",
@@ -101,11 +96,13 @@
     cutoff: 0.08
   };
 
+  const stateProfileCache = new Map();
   const rawGeometryCache = new Map();
   let clusterDataPromise = null;
 
   const el = {
     stateSelect: document.getElementById("stateSelect"),
+    surveySelect: document.getElementById("surveySelect"),
     modelSelect: document.getElementById("modelSelect"),
     mrSelect: document.getElementById("mrSelect"),
     vaccineSelect: document.getElementById("vaccineSelect"),
@@ -153,7 +150,7 @@
     return;
   }
 
-  const baselineMetrics = computeMetrics(baselineInputs);
+  const baselineMetrics = computeMetrics(baselineInputs, null, getStateProfile(baselineInputs.state));
   let rafToken = null;
   let renderSequence = 0;
 
@@ -164,6 +161,7 @@
   function bindEvents() {
     [
       el.stateSelect,
+      el.surveySelect,
       el.modelSelect,
       el.mrSelect,
       el.vaccineSelect,
@@ -185,7 +183,12 @@
   }
 
   function resetControls() {
-    el.stateSelect.value = baselineInputs.state;
+    if (el.surveySelect) {
+      el.surveySelect.value = baselineInputs.survey;
+    }
+    if (el.stateSelect) {
+      el.stateSelect.value = baselineInputs.state;
+    }
     el.modelSelect.value = baselineInputs.model;
     el.mrSelect.value = baselineInputs.mr;
     if (el.vaccineSelect) {
@@ -221,34 +224,46 @@
       el.labCaption.textContent = "Loading state boundary and cluster data...";
     }
 
-    const results = await Promise.all([
-      getProjectedGeometry(inputs.state, inputs.offset),
-      getClusterDataset()
-    ]);
-
-    const geometry = results[0];
-    const clusterDataset = results[1];
-
+    const clusterDataset = await getClusterDataset();
     if (sequenceId !== renderSequence) {
       return;
     }
 
-    const stateData = clusterDataset.states[inputs.state] || { clusters: [], totals: {} };
-    const clusterView = buildClusterView(stateData, inputs.vaccine, geometry.projection);
-    const mesh = buildMesh(inputs, geometry);
-    const metrics = computeMetrics(inputs, mesh);
+    const surveyData = getSurveyData(clusterDataset, inputs.survey);
+    const activeState = syncStateOptions(surveyData, inputs.state);
+    inputs.state = activeState;
 
-    renderMesh(geometry, mesh, stateProfiles[inputs.state], inputs, clusterView);
+    const stateData = (surveyData.states && surveyData.states[activeState])
+      ? surveyData.states[activeState]
+      : { clusters: [], totals: {}, geo_slug: null };
+
+    const geoSlug = stateData.geo_slug;
+    if (!geoSlug) {
+      throw new Error("No GeoJSON slug mapped for state: " + activeState);
+    }
+
+    const geometry = await getProjectedGeometry(geoSlug, inputs.offset);
+    if (sequenceId !== renderSequence) {
+      return;
+    }
+
+    const profile = getStateProfile(inputs.state);
+    const clusterView = buildClusterView(stateData, inputs.vaccine, inputs.mr, geometry.projection);
+    const mesh = buildMesh(inputs, geometry, profile);
+    const metrics = computeMetrics(inputs, mesh, profile);
+
+    renderMesh(geometry, mesh, profile, inputs, clusterView);
     renderMetrics(metrics);
     renderClusterSummary(clusterView);
-    renderBars(inputs);
+    renderBars(inputs, profile);
     renderBullets(inputs, metrics, clusterView);
-    renderCaption(inputs, metrics, geometry, clusterView, clusterDataset);
+    renderCaption(inputs, metrics, geometry, clusterView);
   }
 
   function readInputs() {
     return {
       state: el.stateSelect.value,
+      survey: el.surveySelect ? el.surveySelect.value : "NFHS5",
       model: el.modelSelect.value,
       mr: el.mrSelect.value,
       vaccine: el.vaccineSelect ? el.vaccineSelect.value : "MCV1",
@@ -264,19 +279,57 @@
     el.cutoffLabel.textContent = inputs.cutoff.toFixed(2);
   }
 
-  async function getProjectedGeometry(stateName, offset) {
-    const raw = await getRawStateGeometry(stateName);
+  function getSurveyData(clusterDataset, surveyName) {
+    if (clusterDataset && clusterDataset.surveys && clusterDataset.surveys[surveyName]) {
+      return clusterDataset.surveys[surveyName];
+    }
+    const fallbackName = clusterDataset && clusterDataset.surveys
+      ? Object.keys(clusterDataset.surveys)[0]
+      : null;
+    return fallbackName ? clusterDataset.surveys[fallbackName] : { states: {} };
+  }
+
+  function syncStateOptions(surveyData, preferredState) {
+    const stateNames = Object.keys((surveyData && surveyData.states) || {}).sort();
+    if (!stateNames.length) {
+      return preferredState || "";
+    }
+
+    const currentOptions = Array.from(el.stateSelect.options).map(function (opt) { return opt.value; });
+    const same = currentOptions.length === stateNames.length &&
+      currentOptions.every(function (value, idx) { return value === stateNames[idx]; });
+
+    if (!same) {
+      el.stateSelect.innerHTML = "";
+      stateNames.forEach(function (name) {
+        const opt = document.createElement("option");
+        opt.value = name;
+        opt.textContent = name;
+        el.stateSelect.appendChild(opt);
+      });
+    }
+
+    let selected = preferredState;
+    if (!selected || stateNames.indexOf(selected) === -1) {
+      const existing = el.stateSelect.value;
+      selected = stateNames.indexOf(existing) >= 0 ? existing : stateNames[0];
+    }
+
+    el.stateSelect.value = selected;
+    return selected;
+  }
+
+  async function getProjectedGeometry(geoSlug, offset) {
+    const raw = await getRawStateGeometry(geoSlug);
     return projectStateGeometry(raw, offset);
   }
 
-  async function getRawStateGeometry(stateName) {
-    if (rawGeometryCache.has(stateName)) {
-      return rawGeometryCache.get(stateName);
+  async function getRawStateGeometry(geoSlug) {
+    if (rawGeometryCache.has(geoSlug)) {
+      return rawGeometryCache.get(geoSlug);
     }
 
-    const profile = stateProfiles[stateName];
-    const url = "../data/india-states/" + profile.slug + ".geojson";
-
+    const url = "../data/india-states/" + geoSlug + ".geojson";
     const pending = fetch(url)
       .then(function (response) {
         if (!response.ok) {
@@ -286,7 +339,7 @@
       })
       .then(parseGeoJSONPolygons);
 
-    rawGeometryCache.set(stateName, pending);
+    rawGeometryCache.set(geoSlug, pending);
     return pending;
   }
 
@@ -295,7 +348,7 @@
       return clusterDataPromise;
     }
 
-    const url = "../data/cluster-vax-summary-nfhs4.json";
+    const url = "../data/cluster-vax-summary.json";
     clusterDataPromise = fetch(url)
       .then(function (response) {
         if (!response.ok) {
@@ -496,15 +549,16 @@
     return { minX: minX, maxX: maxX, minY: minY, maxY: maxY };
   }
 
-  function buildClusterView(stateData, vaccine, projection) {
+  function buildClusterView(stateData, vaccine, mrMode, projection) {
     const clusters = Array.isArray(stateData.clusters) ? stateData.clusters : [];
-    const totals = (stateData.totals && stateData.totals[vaccine])
-      ? stateData.totals[vaccine]
-      : { n: 0, ones: 0, zeros: 0, rate: 0 };
+    const mode = mrMode === "mr0" ? "mr0" : "mr1";
+    const onesField = mode === "mr0" ? "ones_mr0" : "ones_mr1";
+    const zerosField = mode === "mr0" ? "zeros_mr0" : "zeros_mr1";
+    const rateField = mode === "mr0" ? "rate_mr0" : "rate_mr1";
 
     let maxN = 1;
     clusters.forEach(function (c) {
-      maxN = Math.max(maxN, c.n || 1);
+      maxN = Math.max(maxN, Number(c.n || 1));
     });
 
     const points = [];
@@ -522,11 +576,19 @@
         return;
       }
 
-      const ones = (c.ones && Number.isFinite(c.ones[vaccine])) ? c.ones[vaccine] : 0;
-      const zeros = (c.zeros && Number.isFinite(c.zeros[vaccine])) ? c.zeros[vaccine] : 0;
-      const n = ones + zeros;
-      const rate = n > 0 ? ones / n : 0;
-      const radius = 1.4 + 3.9 * Math.sqrt(Math.max(c.n || 1, 1) / maxN);
+      const n = Number(c.n || 0);
+      const ones = Number((c[onesField] && c[onesField][vaccine]) || 0);
+      let zeros = Number((c[zerosField] && c[zerosField][vaccine]) || 0);
+      if (!Number.isFinite(zeros) || zeros < 0) {
+        zeros = Math.max(n - ones, 0);
+      }
+
+      let rate = Number((c[rateField] && c[rateField][vaccine]) || 0);
+      if (!Number.isFinite(rate)) {
+        rate = n > 0 ? (ones / n) : 0;
+      }
+
+      const radius = 1.4 + 3.9 * Math.sqrt(Math.max(n, 1) / maxN);
       const majority = ones >= zeros ? 1 : 0;
 
       points.push({
@@ -540,18 +602,31 @@
         radius: radius,
         majority: majority
       });
+
       clusterRateSum += rate;
     });
 
+    let totals = { n: 0, ones: 0, zeros: 0, rate: 0 };
+    if (stateData.totals && stateData.totals[vaccine] && stateData.totals[vaccine][mode]) {
+      totals = stateData.totals[vaccine][mode];
+    } else {
+      points.forEach(function (p) {
+        totals.n += p.n;
+        totals.ones += p.ones;
+        totals.zeros += p.zeros;
+      });
+      totals.rate = totals.n ? (totals.ones / totals.n) : 0;
+    }
+
     return {
+      mode: mode,
       points: points,
       totals: totals,
       clusterMean: points.length ? (clusterRateSum / points.length) : 0
     };
   }
 
-  function buildMesh(inputs, geometry) {
-    const profile = stateProfiles[inputs.state];
+  function buildMesh(inputs, geometry, profile) {
     const cfg = resolutionConfig[inputs.resolution];
     const bounds = geometry.bounds;
     const step = cfg.step;
@@ -756,8 +831,7 @@
     return edges;
   }
 
-  function computeMetrics(inputs, mesh) {
-    const profile = stateProfiles[inputs.state];
+  function computeMetrics(inputs, mesh, profile) {
     const res = resolutionConfig[inputs.resolution];
     const model = modelEffects[inputs.model];
     const mr = mrEffects[inputs.mr];
@@ -872,14 +946,12 @@
       "font-size": "11",
       "font-family": "DM Mono, monospace"
     });
-    badge.textContent = inputs.state + " | " + resolutionConfig[inputs.resolution].label + " | " + inputs.vaccine;
+    badge.textContent = inputs.state + " | " + inputs.survey + " | " + resolutionConfig[inputs.resolution].label + " | " + inputs.vaccine;
     el.meshSvg.appendChild(badge);
   }
 
   function renderClusterLayer(clusterView) {
-    const group = createSvg("g", {
-      "pointer-events": "all"
-    });
+    const group = createSvg("g", { "pointer-events": "all" });
 
     clusterView.points.forEach(function (point) {
       const fill = interpolateRateColor(point.rate);
@@ -899,8 +971,8 @@
         "Cluster " + point.clusterId +
         " | n=" + point.n +
         " | vaccinated=1: " + point.ones +
-        " | vaccinated=0: " + point.zeros +
-        " | rate=" + (point.rate * 100).toFixed(1) + "%";
+        " | unvaccinated (vaccinated=0): " + point.zeros +
+        " | coverage=" + (point.rate * 100).toFixed(1) + "%";
       circle.appendChild(title);
       group.appendChild(circle);
     });
@@ -959,9 +1031,9 @@
     }
 
     const totals = clusterView.totals || { n: 0, ones: 0, zeros: 0, rate: 0 };
-    const n = totals.n || 0;
-    const ones = totals.ones || 0;
-    const zeros = totals.zeros || 0;
+    const n = Number(totals.n || 0);
+    const ones = Number(totals.ones || 0);
+    const zeros = Number(totals.zeros || 0);
 
     el.clusterCountVal.textContent = formatInteger(clusterView.points.length);
     el.childNVal.textContent = formatInteger(n);
@@ -998,10 +1070,10 @@
     node.classList.add(improved ? "good" : "bad");
   }
 
-  function renderBars(inputs) {
-    const sparse = computeMetrics({ state: inputs.state, model: inputs.model, mr: inputs.mr, resolution: 1, offset: inputs.offset, cutoff: inputs.cutoff });
-    const medium = computeMetrics({ state: inputs.state, model: inputs.model, mr: inputs.mr, resolution: 2, offset: inputs.offset, cutoff: inputs.cutoff });
-    const fine = computeMetrics({ state: inputs.state, model: inputs.model, mr: inputs.mr, resolution: 3, offset: inputs.offset, cutoff: inputs.cutoff });
+  function renderBars(inputs, profile) {
+    const sparse = computeMetrics({ state: inputs.state, model: inputs.model, mr: inputs.mr, resolution: 1, offset: inputs.offset, cutoff: inputs.cutoff }, null, profile);
+    const medium = computeMetrics({ state: inputs.state, model: inputs.model, mr: inputs.mr, resolution: 2, offset: inputs.offset, cutoff: inputs.cutoff }, null, profile);
+    const fine = computeMetrics({ state: inputs.state, model: inputs.model, mr: inputs.mr, resolution: 3, offset: inputs.offset, cutoff: inputs.cutoff }, null, profile);
 
     const values = [sparse.unc, medium.unc, fine.unc];
     const maxVal = Math.max.apply(null, values);
@@ -1025,8 +1097,9 @@
   function renderBullets(inputs, metrics, clusterView) {
     if (!el.variationBullets) return;
 
-    const sparse = computeMetrics({ state: inputs.state, model: inputs.model, mr: inputs.mr, resolution: 1, offset: inputs.offset, cutoff: inputs.cutoff });
-    const fine = computeMetrics({ state: inputs.state, model: inputs.model, mr: inputs.mr, resolution: 3, offset: inputs.offset, cutoff: inputs.cutoff });
+    const profile = getStateProfile(inputs.state);
+    const sparse = computeMetrics({ state: inputs.state, model: inputs.model, mr: inputs.mr, resolution: 1, offset: inputs.offset, cutoff: inputs.cutoff }, null, profile);
+    const fine = computeMetrics({ state: inputs.state, model: inputs.model, mr: inputs.mr, resolution: 3, offset: inputs.offset, cutoff: inputs.cutoff }, null, profile);
     const altMr = computeMetrics({
       state: inputs.state,
       model: inputs.model,
@@ -1034,7 +1107,7 @@
       resolution: inputs.resolution,
       offset: inputs.offset,
       cutoff: inputs.cutoff
-    });
+    }, null, profile);
 
     const uncReduction = ((sparse.unc - fine.unc) / sparse.unc) * 100;
     const mrDiff = metrics.unc - altMr.unc;
@@ -1045,8 +1118,8 @@
 
     const bullets = [
       inputs.state + ": moving from sparse/coarse to fine mesh shifts uncertainty from " + sparse.unc.toFixed(3) + " to " + fine.unc.toFixed(3) + " (" + uncReduction.toFixed(1) + "% change).",
-      modelName(inputs.model) + " with " + mrName(inputs.mr) + " gives RMSE " + metrics.rmse.toFixed(3) + " and PPC95 " + (metrics.ppc * 100).toFixed(1) + "%; " + qualityPhrase + ".",
-      "Actual NFHS4 " + inputs.vaccine + " cluster evidence: vaccinated=1 " + formatInteger(totals.ones || 0) + ", vaccinated=0 " + formatInteger(totals.zeros || 0) + " across " + formatInteger(clusterView.points.length) + " geolocated clusters.",
+      modelName(inputs.model) + " with " + mrModeLabel(inputs.mr) + " gives RMSE " + metrics.rmse.toFixed(3) + " and PPC95 " + (metrics.ppc * 100).toFixed(1) + "%; " + qualityPhrase + ".",
+      "Actual " + inputs.survey + " " + inputs.vaccine + " cluster evidence under " + mrModeLabel(inputs.mr) + ": vaccinated=1 " + formatInteger(totals.ones || 0) + ", unvaccinated (vaccinated=0) " + formatInteger(totals.zeros || 0) + " across " + formatInteger(clusterView.points.length) + " geolocated clusters.",
       "Mesh domain is drawn from actual state GeoJSON boundary; offset " + inputs.offset.toFixed(2) + " expands/contracts domain while cutoff " + inputs.cutoff.toFixed(2) + " changes node spacing near edges."
     ];
 
@@ -1058,18 +1131,18 @@
     });
   }
 
-  function renderCaption(inputs, metrics, geometry, clusterView, clusterDataset) {
+  function renderCaption(inputs, metrics, geometry) {
     if (!el.labCaption) return;
     el.labCaption.textContent =
-      "Actual " + inputs.state + " boundary mesh + NFHS4 " + inputs.vaccine + " cluster layer (0/1). " +
-      resolutionConfig[inputs.resolution].label +
+      "Actual " + inputs.state + " boundary mesh + " + inputs.survey + " " + inputs.vaccine + " cluster layer. " +
+      mrModeLabel(inputs.mr) +
+      ", " + resolutionConfig[inputs.resolution].label +
       ", " + modelName(inputs.model) +
-      ", " + mrName(inputs.mr) +
       ". Domain scale: " + geometry.domainFactor.toFixed(2) +
       "x, nodes: " + Math.round(metrics.nodes) +
       ", mean edge: " + metrics.edgeKm.toFixed(1) +
       " km, uncertainty index U: " + metrics.unc.toFixed(3) +
-      ". Data source: " + (clusterDataset.survey || "NFHS") + " " + (clusterDataset.age_group || "") + ".";
+      ". Note: vaccinated=0 means unvaccinated.";
   }
 
   function createSvg(tag, attrs) {
@@ -1078,6 +1151,87 @@
       node.setAttribute(key, attrs[key]);
     });
     return node;
+  }
+
+  function getStateProfile(stateName) {
+    if (knownStateProfiles[stateName]) {
+      return knownStateProfiles[stateName];
+    }
+
+    if (stateProfileCache.has(stateName)) {
+      return stateProfileCache.get(stateName);
+    }
+
+    const hash = Math.abs(hashCode(stateName));
+    const hue = hash % 360;
+    const sat = 56 + (hash % 18);
+    const light = 40 + (hash % 12);
+
+    const profile = {
+      seed: 11 + (hash % 79),
+      color: hslToHex(hue, sat, light),
+      kmPerPx: 2.35 + ((hash % 190) / 100),
+      density: 0.86 + ((hash % 28) / 100),
+      base: {
+        rmse: 0.245 + ((hash % 70) / 1000),
+        unc: 0.165 + ((hash % 90) / 1000),
+        stability: 0.58 + ((hash % 22) / 100),
+        ppc: 0.84 + ((hash % 11) / 100)
+      }
+    };
+
+    // Clamp synthetic defaults into reasonable ranges.
+    profile.base.stability = clamp(profile.base.stability, 0.50, 0.82);
+    profile.base.ppc = clamp(profile.base.ppc, 0.82, 0.93);
+
+    stateProfileCache.set(stateName, profile);
+    return profile;
+  }
+
+  function hashCode(str) {
+    let h = 0;
+    for (let i = 0; i < str.length; i += 1) {
+      h = ((h << 5) - h) + str.charCodeAt(i);
+      h |= 0;
+    }
+    return h;
+  }
+
+  function hslToHex(h, s, l) {
+    const hh = h / 360;
+    const ss = s / 100;
+    const ll = l / 100;
+
+    const hue2rgb = function (p, q, t) {
+      let tt = t;
+      if (tt < 0) tt += 1;
+      if (tt > 1) tt -= 1;
+      if (tt < 1 / 6) return p + (q - p) * 6 * tt;
+      if (tt < 1 / 2) return q;
+      if (tt < 2 / 3) return p + (q - p) * (2 / 3 - tt) * 6;
+      return p;
+    };
+
+    let r;
+    let g;
+    let b;
+
+    if (ss === 0) {
+      r = g = b = ll;
+    } else {
+      const q = ll < 0.5 ? ll * (1 + ss) : ll + ss - ll * ss;
+      const p = 2 * ll - q;
+      r = hue2rgb(p, q, hh + 1 / 3);
+      g = hue2rgb(p, q, hh);
+      b = hue2rgb(p, q, hh - 1 / 3);
+    }
+
+    const toHex = function (x) {
+      const hex = Math.round(x * 255).toString(16);
+      return hex.length === 1 ? "0" + hex : hex;
+    };
+
+    return "#" + toHex(r) + toHex(g) + toHex(b);
   }
 
   function distance(a, b) {
@@ -1103,8 +1257,8 @@
     return value === "inla" ? "INLA-SPDE" : "spGLM";
   }
 
-  function mrName(value) {
-    return value === "mr1" ? "Card + Maternal Recall (MR=1)" : "Card Only (MR=0)";
+  function mrModeLabel(value) {
+    return value === "mr0" ? "MR=0 (card only)" : "MR=1 (card + recall)";
   }
 
   function formatInteger(n) {
