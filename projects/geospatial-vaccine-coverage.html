@@ -26,10 +26,58 @@
   </header>
 
   <main class="content">
-    <section class="card">
-      <h2>1) Project Recap</h2>
-      <p>This pipeline trains on DHS/NFHS cluster points and predicts onto raster grids to produce hyper-local coverage surfaces, uncertainty layers, dropout maps, and state-level evaluation summaries.</p>
-      <p>Primary modeling targets include BCG, DPT, and MCV dose outcomes across NFHS-4 (2015-2016) and NFHS-5 (2019-2021), with direct comparison between card-only and card+maternal-recall scenarios.</p>
+    <section class="card recap-card">
+      <h2>Project Recap</h2>
+
+      <p>Childhood vaccination remains one of the most effective public health interventions for preventing avoidable morbidity and mortality. In India, the scale of the National Family Health Survey (NFHS) and the Universal Immunization Program (UIP) reflects the national commitment to improving routine immunisation coverage. However, translating survey-based vaccination data into reliable, policy-relevant local estimates remains methodologically challenging.</p>
+
+      <p>A central difficulty arises from the way vaccination status is recorded in household surveys. When a vaccination card is unavailable, coverage is derived from maternal recall. While recall expands usable sample size, it may introduce reporting bias either overestimation or underestimation depending on mothers’ ability to accurately remember specific vaccine doses. This creates a structural tension between completeness of data and reliability of documentation, especially across states where immunization card availability varies substantially.</p>
+
+      <p>The vaccination card is an essential tool to ensure that a child obtains all necessary immunizations according to the approved schedule. Accurate and prompt vaccination documentation is crucial to ensure that those who require prescribed vaccine doses receive them, while simultaneously preventing over-administration of vaccines to adequately immunized children. Nevertheless, the provision of immunization cards varies among different States and Union Territories as health falls within the jurisdiction of state governments.</p>
+
+      <p>Immunization research in India often lacks a granular understanding of where vaccination rates are low and why children drop out of multi-dose vaccine programs. This study addresses these gaps by utilizing data from the NFHS4 and NFHS5 surveys to identify specific locations with consistently low coverage and high dropout rates. By employing hyper-local mapping and incorporating maternal recall data, the research offers a more comprehensive picture of immunization patterns across India. This detailed approach aims to improve our understanding of vaccine coverage disparities and inform targeted interventions and policy decisions. Furthermore, by pioneering the inclusion of maternal recall, the study acknowledges the potential limitations of such data while emphasizing its value in achieving a deeper understanding of immunization trends.</p>
+
+      <p>Studies have revealed mixed results on the dependency of maternal recall for estimating vaccination coverage. A study in Senegal found that maternal recall underestimated vaccination rates compared to documented records. It highlights that more studies are needed to understand the factors influencing the accuracy of maternal recall [39]. Understanding how well mothers remember their children’s vaccinations could be crucial, especially in situations where documented records are unavailable.</p>
+
+      <p>A comprehensive approach is crucial in India to improve routine vaccination coverage, especially in districts lagging behind. A separate study examined routine childhood measles-containing vaccine coverage from 2000 to 2019 in 101 low- and middle-income countries, using various models [27][26]. Previous studies of spatial regression models that combine covariate information and incorporate random effects to address two levels of spatial correlation within the linear predictor are available for some countries like Pakistan [15][50][46]. On national level, the Indian Universal Immunization Program (UIP) is an extensive public health endeavor that aims to vaccinate over 27 million children annually, making it the largest project of its type [28]. According to administrative data, there was an increase in full immunization coverage after the first two rounds of the Mission Indradhanush program. Contrary to this, as per the National Family Health Survey (NFHS-4), immunization coverage has increased in all Indian states except for Tamil Nadu, Haryana, Himachal Pradesh, Uttarakhand, and Maharashtra. Further investigation is necessary in response to this finding. One crucial purpose of MI was to focus on children from marginalized communities, including migrant, tribal, and other difficult-to-access groups [24]. Within the current demand-supply paradigm, it is necessary to determine if there are variations in vaccine coverage between districts, states, or regions. The Union Ministry of Health and Family Welfare is now implementing Intensified Mission Indradhanush (IMI 5.0), which is the primary routine vaccination campaign. IMI 5.0 is being carried out in three phases: from 7th to 12th August, 11th to 16th September, and 9th to 14th October 2023 [25]. Nevertheless, there is a clear disparity between the stated full vaccination coverage in the program statistics and the estimates derived from national-level household surveys done in different states. These misconceptions mostly arise from disparities between the reported rates of complete immunization as documented on immunization cards and those based on the mother’s memory, as estimated in several rounds of the National Family Health Survey (NFHS) in India [38].</p>
+
+      <div class="recap-panel">
+        <p>This project directly addresses that challenge through a spatial Bayesian modeling pipeline designed to produce hyper-local immunization coverage surfaces across India. The system trains on DHS/NFHS cluster-level survey points and predicts onto high-resolution raster grids, generating:</p>
+        <ul class="recap-list">
+          <li>Continuous vaccination coverage maps</li>
+          <li>Uncertainty (posterior standard deviation) layers</li>
+          <li>Multi-dose dropout maps</li>
+          <li>State-level evaluation summaries</li>
+          <li>Direct scenario comparisons (card-only vs card + maternal recall)</li>
+        </ul>
+      </div>
+
+      <p>Primary modeling targets include BCG, DPT, and MCV dose outcomes across NFHS-4 (2015-2016) and NFHS-5 (2019-2021). By explicitly modeling both documentation-based and recall-augmented scenarios, the pipeline allows structured comparison of how maternal recall influences estimated coverage levels and spatial patterns.</p>
+
+      <p>This study innovates by investigating the spatial and temporal dynamics of MCV vaccination coverage in India, focusing on hyper-local mapping. Previous research primarily assessed national or regional rates, while this project examines coverage at a granular level within specific localities over several years. This approach reveals potential disparities and inequities in access and utilization masked by coarser analyses. Pioneering the inclusion of maternal recall in vaccine research, the framework acknowledges its potential impact on data accuracy. Leveraging nationally representative datasets like NFHS4 and NFHS5, it provides longitudinal insights into spatial and temporal patterns of vaccination coverage and multi-dose dropout rates. This focus adds nuance to understanding vaccination success and addresses the need for precise, localized information for targeted interventions and policy decisions.</p>
+
+      <p>Using spatial Bayesian hierarchical models with structured random effects, the framework captures sub-national heterogeneity while accounting for spatial correlation. Rather than reporting only national or state averages, the project produces granular coverage maps that reveal hyper-local coldspots, areas with persistently low vaccination uptake or high dropout between multi-dose schedules. This level of spatial detail is critical for identifying underserved populations, including migrant, tribal, and geographically isolated communities, which are often a focus of initiatives such as Mission Indradhanush and its intensified phases.</p>
+
+      <p>Importantly, this work does not treat maternal recall merely as auxiliary information; instead, it evaluates its structural impact on spatial estimates. By comparing card-only models to card-plus-recall models across two NFHS rounds, the project:</p>
+      <ul class="recap-list">
+        <li>Quantifies potential overstatement of coverage in regions with low card retention</li>
+        <li>Identifies districts where recall substantially shifts estimated vaccination rates</li>
+        <li>Examines temporal changes in spatial disparities between 2015-16 and 2019-21</li>
+        <li>Provides uncertainty-aware surfaces that reflect both sampling and modeling variability</li>
+      </ul>
+
+      <p>This dual-scenario modeling strategy contributes to resolving discrepancies frequently observed between administrative program statistics and household survey estimates. By integrating uncertainty propagation and hyper-local spatial prediction, the pipeline produces decision-ready maps that can guide targeted immunization interventions, resource allocation, and evaluation of large-scale campaigns such as Intensified Mission Indradhanush.</p>
+
+      <p>Overall, the project advances immunization research in India by combining:</p>
+      <ol class="recap-steps">
+        <li>Spatial-temporal Bayesian modeling</li>
+        <li>Explicit treatment of maternal recall assumptions</li>
+        <li>High-resolution predictive mapping</li>
+        <li>Multi-dose dropout analysis</li>
+        <li>Cross-round NFHS comparison</li>
+      </ol>
+
+      <p class="recap-close">The result is a robust analytical framework that moves beyond aggregate coverage metrics to deliver localized, uncertainty-calibrated insights and enables more precise identification of vaccination inequities and better-informed public health planning.</p>
     </section>
 
     <section class="card" id="mesh-lab">
@@ -48,12 +96,7 @@
         <div class="lab-controls">
           <label class="lab-label">State
             <select id="stateSelect">
-              <option value="Uttar Pradesh">Uttar Pradesh</option>
-              <option value="Bihar">Bihar</option>
-              <option value="Assam">Assam</option>
-              <option value="Maharashtra">Maharashtra</option>
-              <option value="Rajasthan">Rajasthan</option>
-              <option value="Nagaland">Nagaland</option>
+              <option value="">Loading all NFHS states...</option>
             </select>
           </label>
 

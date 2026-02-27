@@ -552,13 +552,15 @@
   function buildClusterView(stateData, vaccine, mrMode, projection) {
     const clusters = Array.isArray(stateData.clusters) ? stateData.clusters : [];
     const mode = mrMode === "mr0" ? "mr0" : "mr1";
+    const nField = mode === "mr0" ? "n_mr0" : "n_mr1";
     const onesField = mode === "mr0" ? "ones_mr0" : "ones_mr1";
     const zerosField = mode === "mr0" ? "zeros_mr0" : "zeros_mr1";
     const rateField = mode === "mr0" ? "rate_mr0" : "rate_mr1";
 
     let maxN = 1;
     clusters.forEach(function (c) {
-      maxN = Math.max(maxN, Number(c.n || 1));
+      const nVal = Number(c[nField] || c.n || 0);
+      maxN = Math.max(maxN, nVal);
     });
 
     const points = [];
@@ -576,7 +578,14 @@
         return;
       }
 
-      const n = Number(c.n || 0);
+      let n = Number(c[nField]);
+      if (!Number.isFinite(n)) {
+        n = Number(c.n || 0);
+      }
+      if (!Number.isFinite(n) || n <= 0) {
+        return;
+      }
+
       const ones = Number((c[onesField] && c[onesField][vaccine]) || 0);
       let zeros = Number((c[zerosField] && c[zerosField][vaccine]) || 0);
       if (!Number.isFinite(zeros) || zeros < 0) {
@@ -1034,13 +1043,14 @@
     const n = Number(totals.n || 0);
     const ones = Number(totals.ones || 0);
     const zeros = Number(totals.zeros || 0);
+    const denomText = clusterView.mode === "mr0" ? "of card records" : "of children";
 
     el.clusterCountVal.textContent = formatInteger(clusterView.points.length);
     el.childNVal.textContent = formatInteger(n);
     el.oneVal.textContent = formatInteger(ones);
     el.zeroVal.textContent = formatInteger(zeros);
-    el.oneShareVal.textContent = n > 0 ? (100 * ones / n).toFixed(1) + "% of children" : "-";
-    el.zeroShareVal.textContent = n > 0 ? (100 * zeros / n).toFixed(1) + "% of children" : "-";
+    el.oneShareVal.textContent = n > 0 ? (100 * ones / n).toFixed(1) + "% " + denomText : "-";
+    el.zeroShareVal.textContent = n > 0 ? (100 * zeros / n).toFixed(1) + "% " + denomText : "-";
     el.clusterMeanVal.textContent = (clusterView.clusterMean * 100).toFixed(1) + "%";
   }
 
@@ -1115,11 +1125,14 @@
     const qualityPhrase = rmseDiff < -0.01 ? "fit improves meaningfully" : (rmseDiff > 0.01 ? "fit degrades versus baseline" : "fit stays close to baseline");
 
     const totals = clusterView.totals || { n: 0, ones: 0, zeros: 0 };
+    const denomScope = inputs.mr === "mr0"
+      ? "card records only"
+      : "all children (card + recall)";
 
     const bullets = [
       inputs.state + ": moving from sparse/coarse to fine mesh shifts uncertainty from " + sparse.unc.toFixed(3) + " to " + fine.unc.toFixed(3) + " (" + uncReduction.toFixed(1) + "% change).",
       modelName(inputs.model) + " with " + mrModeLabel(inputs.mr) + " gives RMSE " + metrics.rmse.toFixed(3) + " and PPC95 " + (metrics.ppc * 100).toFixed(1) + "%; " + qualityPhrase + ".",
-      "Actual " + inputs.survey + " " + inputs.vaccine + " cluster evidence under " + mrModeLabel(inputs.mr) + ": vaccinated=1 " + formatInteger(totals.ones || 0) + ", unvaccinated (vaccinated=0) " + formatInteger(totals.zeros || 0) + " across " + formatInteger(clusterView.points.length) + " geolocated clusters.",
+      "Actual " + inputs.survey + " " + inputs.vaccine + " cluster evidence under " + mrModeLabel(inputs.mr) + ": vaccinated=1 " + formatInteger(totals.ones || 0) + ", unvaccinated (vaccinated=0) " + formatInteger(totals.zeros || 0) + " across " + formatInteger(clusterView.points.length) + " geolocated clusters (" + denomScope + ").",
       "Mesh domain is drawn from actual state GeoJSON boundary; offset " + inputs.offset.toFixed(2) + " expands/contracts domain while cutoff " + inputs.cutoff.toFixed(2) + " changes node spacing near edges."
     ];
 
@@ -1133,6 +1146,9 @@
 
   function renderCaption(inputs, metrics, geometry) {
     if (!el.labCaption) return;
+    const sourceScope = inputs.mr === "mr0"
+      ? "card records only"
+      : "card + recall";
     el.labCaption.textContent =
       "Actual " + inputs.state + " boundary mesh + " + inputs.survey + " " + inputs.vaccine + " cluster layer. " +
       mrModeLabel(inputs.mr) +
@@ -1142,7 +1158,7 @@
       "x, nodes: " + Math.round(metrics.nodes) +
       ", mean edge: " + metrics.edgeKm.toFixed(1) +
       " km, uncertainty index U: " + metrics.unc.toFixed(3) +
-      ". Note: vaccinated=0 means unvaccinated.";
+      ". Source scope: " + sourceScope + ". Note: vaccinated=0 means unvaccinated.";
   }
 
   function createSvg(tag, attrs) {

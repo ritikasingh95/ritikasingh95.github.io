@@ -153,6 +153,54 @@ h1 {
   margin: 0.36rem 0;
 }
 
+.recap-card {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 92% 14%, rgba(200, 82, 42, 0.14), transparent 28%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.68));
+}
+
+.recap-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: linear-gradient(180deg, #c8522a 0%, #df8e66 100%);
+}
+
+.recap-card > * {
+  position: relative;
+}
+
+.recap-panel {
+  margin: 0.8rem 0 0.9rem;
+  padding: 0.78rem 0.85rem;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.65);
+}
+
+.recap-list,
+.recap-steps {
+  margin-top: 0.45rem;
+}
+
+.recap-list li::marker,
+.recap-steps li::marker {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.recap-close {
+  margin-top: 0.85rem;
+  padding: 0.74rem 0.85rem;
+  border: 1px dashed rgba(200, 82, 42, 0.46);
+  background: rgba(200, 82, 42, 0.06);
+}
+
 .two-col {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

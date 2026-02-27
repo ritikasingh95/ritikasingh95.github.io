@@ -123,7 +123,10 @@ def init_cluster(cluster_id, lon, lat):
         "lon_sum": lon,
         "lat_sum": lat,
         "coord_n": 1,
-        "n": 0,
+        # MR=1 denominator: all children.
+        "n_mr1": 0,
+        # MR=0 denominator: children with card evidence only.
+        "n_mr0": 0,
         "ones_mr0": {k: 0 for k in VACCINES},
         "ones_mr1": {k: 0 for k in VACCINES},
     }
@@ -158,15 +161,18 @@ def build_survey(individual_csv, cluster_csv, geo_slug_lookup, slug_alias):
                 cluster["lat_sum"] += coords["lat"]
                 cluster["coord_n"] += 1
 
-            cluster["n"] += 1
+            has_card = as_binary(row.get("Has_Health_Card"))
+            cluster["n_mr1"] += 1
+            if has_card:
+                cluster["n_mr0"] += 1
 
             for vaccine, (card_col, recall_col) in VACCINES.items():
                 card = as_binary(row.get(card_col))
                 recall = as_binary(row.get(recall_col))
-                mr0 = card
                 mr1 = 1 if (card or recall) else 0
 
-                cluster["ones_mr0"][vaccine] += mr0
+                if has_card:
+                    cluster["ones_mr0"][vaccine] += card
                 cluster["ones_mr1"][vaccine] += mr1
 
     survey = {
@@ -188,7 +194,8 @@ def build_survey(individual_csv, cluster_csv, geo_slug_lookup, slug_alias):
         }
 
         for cluster_id, cluster in clusters.items():
-            n_val = cluster["n"]
+            n_mr0 = cluster["n_mr0"]
+            n_mr1 = cluster["n_mr1"]
             lon = cluster["lon_sum"] / max(cluster["coord_n"], 1)
             lat = cluster["lat_sum"] / max(cluster["coord_n"], 1)
 
@@ -200,22 +207,22 @@ def build_survey(individual_csv, cluster_csv, geo_slug_lookup, slug_alias):
             for vaccine in VACCINES:
                 ones0 = cluster["ones_mr0"][vaccine]
                 ones1 = cluster["ones_mr1"][vaccine]
-                zero0 = max(n_val - ones0, 0)
-                zero1 = max(n_val - ones1, 0)
+                zero0 = max(n_mr0 - ones0, 0)
+                zero1 = max(n_mr1 - ones1, 0)
 
-                rates_mr0[vaccine] = (ones0 / n_val) if n_val else 0.0
-                rates_mr1[vaccine] = (ones1 / n_val) if n_val else 0.0
+                rates_mr0[vaccine] = (ones0 / n_mr0) if n_mr0 else 0.0
+                rates_mr1[vaccine] = (ones1 / n_mr1) if n_mr1 else 0.0
                 zeros_mr0[vaccine] = zero0
                 zeros_mr1[vaccine] = zero1
 
                 total0 = state_entry["totals"][vaccine]["mr0"]
                 total1 = state_entry["totals"][vaccine]["mr1"]
 
-                total0["n"] += n_val
+                total0["n"] += n_mr0
                 total0["ones"] += ones0
                 total0["zeros"] += zero0
 
-                total1["n"] += n_val
+                total1["n"] += n_mr1
                 total1["ones"] += ones1
                 total1["zeros"] += zero1
 
@@ -224,7 +231,9 @@ def build_survey(individual_csv, cluster_csv, geo_slug_lookup, slug_alias):
                     "cluster_id": cluster_id,
                     "lon": round(lon, 6),
                     "lat": round(lat, 6),
-                    "n": n_val,
+                    "n": n_mr1,
+                    "n_mr0": n_mr0,
+                    "n_mr1": n_mr1,
                     "ones_mr0": cluster["ones_mr0"],
                     "ones_mr1": cluster["ones_mr1"],
                     "zeros_mr0": zeros_mr0,
