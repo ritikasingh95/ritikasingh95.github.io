@@ -291,25 +291,150 @@
       </section>
     </div>
 
-    <section class="card two-col">
-      <div>
-        <h2>3) Spatial Scale and Why It Works</h2>
-        <h3>Scale</h3>
-        <ul>
-          <li>Training: survey cluster coordinates.</li>
-          <li>Prediction: boundary-constrained raster grid.</li>
-          <li>Reporting: state-level aggregated summaries.</li>
-        </ul>
-        <h3>Signal vs Noise Tradeoff</h3>
-        <p>Cluster-level inputs preserve observed survey signal. Latent spatial smoothing regularizes sparse/noisy areas before rasterized outputs are exported for planning.</p>
+    <section class="card">
+      <h2>3) Spatial Scale and Why It Works</h2>
+      <p>This pipeline is interpretable because each scale answers a different operational question, from observed evidence to planning-level allocation.</p>
+
+      <div class="interp-grid">
+        <article class="interp-card">
+          <h3>Cluster Evidence Scale</h3>
+          <p>At survey-cluster points, we observe children with binary vaccine status. This is the direct field signal.</p>
+          <div class="eq-block">
+            <p class="eq-title">Observed cluster proportion</p>
+            <p class="eq-line">p&#771;<sub>i</sub> = y<sub>i</sub> / n<sub>i</sub></p>
+          </div>
+          <p class="interp-note">Interpretation: where <code>n<sub>i</sub></code> is small, raw proportions are noisy and should not be used alone.</p>
+        </article>
+
+        <article class="interp-card">
+          <h3>Grid Prediction Scale</h3>
+          <p>Predictions are generated on dense grid cells inside state boundaries, combining covariates and spatial structure.</p>
+          <div class="eq-block">
+            <p class="eq-title">Predicted grid probability</p>
+            <p class="eq-line">p&#770;<sub>g</sub> = logit<sup>-1</sup>(x<sub>g</sub><sup>T</sup>&#946; + w(s<sub>g</sub>) + u<sub>state(g)</sub> + u<sub>district(g)</sub>)</p>
+          </div>
+          <p class="interp-note">Interpretation: this surface reveals hyper-local continuity gaps that state averages hide.</p>
+        </article>
+
+        <article class="interp-card">
+          <h3>State Summary Scale</h3>
+          <p>Grid outputs are aggregated into state-level summaries for planning and inter-state comparison.</p>
+          <div class="eq-block">
+            <p class="eq-title">Population-weighted state estimate</p>
+            <p class="eq-line">P&#770;<sub>state</sub> = [&sum;<sub>g&#8712;state</sub> N<sub>g</sub> p&#770;<sub>g</sub>] / [&sum;<sub>g&#8712;state</sub> N<sub>g</sub>]</p>
+          </div>
+          <p class="interp-note">Interpretation: summary values are policy-facing, while maps preserve local targeting fidelity.</p>
+        </article>
       </div>
-      <div>
-        <h2>4) Core Statistical Model</h2>
-        <p>For cluster <code>i</code>, vaccine outcome <code>v</code>, period <code>t</code>, maternal-recall regime <code>m in {0,1}</code>:</p>
-        <div class="math">y_{i,v,t}^{(m)} ~ Binomial(n_{i,v,t}, p_{i,v,t}^{(m)})</div>
-        <div class="math">logit(p_{i,v,t}^{(m)}) = x_i^T beta_{v,t,m} + w_{v,t,m}(s_i) + b_{state(i)} + b_{district(i)}</div>
-        <p>where <code>s_i = (lon_i, lat_i)</code> and <code>w(·)</code> is the latent spatial field.</p>
+
+      <h3>Why This Scale Design Works</h3>
+      <ul>
+        <li><strong>Signal retention:</strong> cluster-level observations preserve real survey variation.</li>
+        <li><strong>Noise control:</strong> spatial pooling reduces instability in sparse areas.</li>
+        <li><strong>Actionability:</strong> grid maps guide micro-targeting; state summaries guide budgeting and monitoring.</li>
+        <li><strong>Interpretability:</strong> each output can be traced back to observed child-level evidence.</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>4) Core Statistical Model: spGLM vs INLA-SPDE</h2>
+      <p>Both methods model the same vaccination process but with different spatial representations and inference engines. Comparing them is methodologically important because agreement increases confidence, while divergence exposes sensitivity to modelling assumptions.</p>
+
+      <div class="model-grid">
+        <article class="model-card">
+          <h3>spGLM (Gaussian Process Logistic Model)</h3>
+          <p><strong>What it does:</strong> models spatial correlation directly through a dense Gaussian process covariance.</p>
+
+          <div class="eq-block">
+            <p class="eq-title">Likelihood</p>
+            <p class="eq-line">Y<sub>i</sub> | p<sub>i</sub> ~ Binomial(n<sub>i</sub>, p<sub>i</sub>)</p>
+            <p class="eq-line">logit(p<sub>i</sub>) = x<sub>i</sub><sup>T</sup>&#946; + w(s<sub>i</sub>) + u<sub>state(i)</sub> + u<sub>district(i)</sub></p>
+          </div>
+
+          <div class="eq-block">
+            <p class="eq-title">Spatial covariance (Mat&#233;rn GP)</p>
+            <p class="eq-line">Cov[w(s<sub>i</sub>), w(s<sub>j</sub>)] = &#963;<sup>2</sup> {2<sup>1-&#957;</sup> / &#915;(&#957;)} (&#954; d<sub>ij</sub>)<sup>&#957;</sup> K<sub>&#957;</sub>(&#954; d<sub>ij</sub>)</p>
+          </div>
+
+          <div class="eq-block">
+            <p class="eq-title">Posterior target</p>
+            <p class="eq-line">&#960;(&#946;, w, &#952; | y) &#8733; [&prod;<sub>i</sub> Bin(y<sub>i</sub> | n<sub>i</sub>, p<sub>i</sub>)] &#960;(&#946;) &#960;(w | &#952;) &#960;(&#952;)</p>
+          </div>
+
+          <ul>
+            <li><strong>Strengths:</strong> flexible covariance specification; strong generative interpretation.</li>
+            <li><strong>Limitations:</strong> dense covariance inversion is expensive for large cluster counts.</li>
+          </ul>
+        </article>
+
+        <article class="model-card">
+          <h3>INLA-SPDE (Latent GMRF Approximation)</h3>
+          <p><strong>What it does:</strong> approximates the same Mat&#233;rn field via a mesh and sparse precision matrix for fast Bayesian inference.</p>
+
+          <div class="eq-block">
+            <p class="eq-title">Observation and linear predictor</p>
+            <p class="eq-line">Y<sub>i</sub> | &#951;<sub>i</sub> ~ Binomial(n<sub>i</sub>, logit<sup>-1</sup>(&#951;<sub>i</sub>))</p>
+            <p class="eq-line">&#951;<sub>i</sub> = x<sub>i</sub><sup>T</sup>&#946; + A<sub>i&#183;</sub>&#969; + u<sub>state(i)</sub> + u<sub>district(i)</sub></p>
+          </div>
+
+          <div class="eq-block">
+            <p class="eq-title">SPDE representation</p>
+            <p class="eq-line">(&#954;<sup>2</sup> - &#916;)<sup>&#945;/2</sup>(&#964; w(s)) = W(s)</p>
+            <p class="eq-line">w(s) &#8776; &sum;<sub>k=1</sub><sup>K</sup> &#968;<sub>k</sub>(s) &#969;<sub>k</sub>, &nbsp; &#969; ~ N(0, Q(&#954;, &#964;)<sup>-1</sup>)</p>
+          </div>
+
+          <div class="eq-block">
+            <p class="eq-title">INLA marginal approximation</p>
+            <p class="eq-line">&#960;(x<sub>j</sub> | y) = &int; &#960;(x<sub>j</sub> | &#952;, y) &#960;(&#952; | y) d&#952;</p>
+          </div>
+
+          <ul>
+            <li><strong>Strengths:</strong> scalable with sparse precision matrices; fast posterior marginals.</li>
+            <li><strong>Limitations:</strong> approximation quality can depend on mesh/prior settings.</li>
+          </ul>
+        </article>
       </div>
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Comparison Dimension</th>
+              <th>spGLM</th>
+              <th>INLA-SPDE</th>
+              <th>Why Compare Here</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Spatial field representation</td>
+              <td>Dense Gaussian process covariance</td>
+              <td>Mesh-based Mat&#233;rn GMRF</td>
+              <td>Checks if hotspot structure is robust to representation choice.</td>
+            </tr>
+            <tr>
+              <td>Inference engine</td>
+              <td>Posterior sampling/optimization over GP parameters</td>
+              <td>Deterministic nested Laplace approximation</td>
+              <td>Separates computational approximation effects from data effects.</td>
+            </tr>
+            <tr>
+              <td>Computational scaling</td>
+              <td>Heavier at large <code>n</code> due to dense matrix operations</td>
+              <td>Faster for large domains via sparse precision algebra</td>
+              <td>Important for repeated MR scenarios, vaccines, and states.</td>
+            </tr>
+            <tr>
+              <td>Practical output behavior</td>
+              <td>Flexible, can be smoother or rougher based on kernel settings</td>
+              <td>Mesh-aware smoothing with explicit boundary control</td>
+              <td>Explains differences in uncertainty surfaces and coldspot stability.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="note"><strong>Interpretation rule:</strong> when both methods agree on low-coverage or high-dropout locations, those pockets are high-confidence priorities. When they differ, prioritize locations with consistently high uncertainty for additional field validation before intervention scaling.</p>
     </section>
 
     <section class="card two-col">

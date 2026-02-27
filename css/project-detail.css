@@ -655,6 +655,70 @@ h1 {
   overflow-x: auto;
 }
 
+.interp-grid,
+.model-grid {
+  margin-top: 0.75rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.model-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.interp-card,
+.model-card {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.74);
+  padding: 0.75rem 0.8rem;
+}
+
+.interp-card h3,
+.model-card h3 {
+  margin: 0 0 0.32rem;
+  font-size: 1rem;
+}
+
+.interp-card p,
+.model-card p {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.interp-note {
+  margin-top: 0.5rem !important;
+  color: var(--muted);
+}
+
+.eq-block {
+  margin-top: 0.58rem;
+  border: 1px dashed rgba(200, 82, 42, 0.36);
+  background: rgba(200, 82, 42, 0.05);
+  padding: 0.48rem 0.58rem;
+}
+
+.eq-title {
+  margin: 0;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem !important;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.eq-line {
+  margin: 0.24rem 0 0 !important;
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.02rem !important;
+  line-height: 1.42;
+  overflow-x: auto;
+}
+
+.model-card ul {
+  margin: 0.6rem 0 0 1rem;
+}
+
 .code {
   margin-top: 0.7rem;
   background: #141414;
@@ -1179,6 +1243,11 @@ h1 {
 
   .cluster-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .interp-grid,
+  .model-grid {
+    grid-template-columns: 1fr;
   }
 
   .quiz-option {
