@@ -42,6 +42,19 @@
         <h3>Pipeline Outputs</h3>
         <p class="output-graph-sub">What the modeling pipeline produces for policy and program action</p>
         <div class="output-graph" role="group" aria-label="Pipeline outputs graph">
+          <svg class="output-links" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <marker id="outputArrow" markerWidth="6" markerHeight="6" refX="5.2" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill="rgba(200,82,42,0.68)"></path>
+              </marker>
+            </defs>
+            <line x1="50" y1="50" x2="18" y2="18"></line>
+            <line x1="50" y1="50" x2="50" y2="12"></line>
+            <line x1="50" y1="50" x2="82" y2="18"></line>
+            <line x1="50" y1="50" x2="18" y2="84"></line>
+            <line x1="50" y1="50" x2="82" y2="84"></line>
+          </svg>
+
           <div class="output-hub">
             <p>Spatial Bayesian Pipeline</p>
             <small>DHS/NFHS clusters -> raster predictions</small>
@@ -301,7 +314,19 @@
           <p>At survey-cluster points, we observe children with binary vaccine status. This is the direct field signal.</p>
           <div class="eq-block">
             <p class="eq-title">Observed cluster proportion</p>
-            <p class="eq-line">p&#771;<sub>i</sub> = y<sub>i</sub> / n<sub>i</sub></p>
+            <div class="eq-math">
+              <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+                <msub>
+                  <mover><mi>p</mi><mo>^</mo></mover>
+                  <mi>i</mi>
+                </msub>
+                <mo>=</mo>
+                <mfrac>
+                  <msub><mi>y</mi><mi>i</mi></msub>
+                  <msub><mi>n</mi><mi>i</mi></msub>
+                </mfrac>
+              </math>
+            </div>
           </div>
           <p class="interp-note">Interpretation: where <code>n<sub>i</sub></code> is small, raw proportions are noisy and should not be used alone.</p>
         </article>
@@ -311,7 +336,29 @@
           <p>Predictions are generated on dense grid cells inside state boundaries, combining covariates and spatial structure.</p>
           <div class="eq-block">
             <p class="eq-title">Predicted grid probability</p>
-            <p class="eq-line">p&#770;<sub>g</sub> = logit<sup>-1</sup>(x<sub>g</sub><sup>T</sup>&#946; + w(s<sub>g</sub>) + u<sub>state(g)</sub> + u<sub>district(g)</sub>)</p>
+            <div class="eq-math">
+              <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+                <msub>
+                  <mover><mi>p</mi><mo>^</mo></mover>
+                  <mi>g</mi>
+                </msub>
+                <mo>=</mo>
+                <msup>
+                  <mi>logit</mi>
+                  <mrow><mo>-</mo><mn>1</mn></mrow>
+                </msup>
+                <mo>(</mo>
+                <msup><msub><mi>x</mi><mi>g</mi></msub><mi>T</mi></msup>
+                <mi>&beta;</mi>
+                <mo>+</mo>
+                <mi>w</mi><mo>(</mo><msub><mi>s</mi><mi>g</mi></msub><mo>)</mo>
+                <mo>+</mo>
+                <msub><mi>u</mi><mrow><mtext>state</mtext><mo>(</mo><mi>g</mi><mo>)</mo></mrow></msub>
+                <mo>+</mo>
+                <msub><mi>u</mi><mrow><mtext>district</mtext><mo>(</mo><mi>g</mi><mo>)</mo></mrow></msub>
+                <mo>)</mo>
+              </math>
+            </div>
           </div>
           <p class="interp-note">Interpretation: this surface reveals hyper-local continuity gaps that state averages hide.</p>
         </article>
@@ -321,7 +368,26 @@
           <p>Grid outputs are aggregated into state-level summaries for planning and inter-state comparison.</p>
           <div class="eq-block">
             <p class="eq-title">Population-weighted state estimate</p>
-            <p class="eq-line">P&#770;<sub>state</sub> = [&sum;<sub>g&#8712;state</sub> N<sub>g</sub> p&#770;<sub>g</sub>] / [&sum;<sub>g&#8712;state</sub> N<sub>g</sub>]</p>
+            <div class="eq-math">
+              <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+                <msub>
+                  <mover><mi>P</mi><mo>^</mo></mover>
+                  <mtext>state</mtext>
+                </msub>
+                <mo>=</mo>
+                <mfrac>
+                  <mrow>
+                    <msub><mo>&sum;</mo><mrow><mi>g</mi><mo>&isin;</mo><mtext>state</mtext></mrow></msub>
+                    <msub><mi>N</mi><mi>g</mi></msub>
+                    <msub><mover><mi>p</mi><mo>^</mo></mover><mi>g</mi></msub>
+                  </mrow>
+                  <mrow>
+                    <msub><mo>&sum;</mo><mrow><mi>g</mi><mo>&isin;</mo><mtext>state</mtext></mrow></msub>
+                    <msub><mi>N</mi><mi>g</mi></msub>
+                  </mrow>
+                </mfrac>
+              </math>
+            </div>
           </div>
           <p class="interp-note">Interpretation: summary values are policy-facing, while maps preserve local targeting fidelity.</p>
         </article>
@@ -336,120 +402,177 @@
       </ul>
     </section>
 
-    <section class="card">
+    <section class="card" id="core-model">
       <h2>4) Core Statistical Model: spGLM vs INLA-SPDE</h2>
-      <p>Both methods model the same vaccination process but with different spatial representations and inference engines. Comparing them is methodologically important because agreement increases confidence, while divergence exposes sensitivity to modelling assumptions.</p>
+      <p>This section is interactive by design. Read the basic explanation first, then tap a question to open detailed mathematical modeling, comparison logic, and strengths-versus-limitations.</p>
 
-      <div class="model-grid">
+      <div class="model-basics">
         <article class="model-card">
           <h3>spGLM (Gaussian Process Logistic Model)</h3>
-          <p><strong>What it does:</strong> models spatial correlation directly through a dense Gaussian process covariance.</p>
-
+          <p><strong>Basic explanation:</strong> spGLM models vaccination probability with a logistic link and a spatial Gaussian process that captures distance-driven similarity between clusters.</p>
           <div class="eq-block">
-            <p class="eq-title">Likelihood</p>
-            <p class="eq-line">Y<sub>i</sub> | p<sub>i</sub> ~ Binomial(n<sub>i</sub>, p<sub>i</sub>)</p>
-            <p class="eq-line">logit(p<sub>i</sub>) = x<sub>i</sub><sup>T</sup>&#946; + w(s<sub>i</sub>) + u<sub>state(i)</sub> + u<sub>district(i)</sub></p>
+            <p class="eq-title">Core predictor form</p>
+            <div class="eq-math">
+              <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+                <mrow>
+                  <mi>logit</mi><mo>(</mo><msub><mi>p</mi><mi>i</mi></msub><mo>)</mo>
+                  <mo>=</mo>
+                  <msup><msub><mi>x</mi><mi>i</mi></msub><mi>T</mi></msup><mi>&beta;</mi>
+                  <mo>+</mo><mi>w</mi><mo>(</mo><msub><mi>s</mi><mi>i</mi></msub><mo>)</mo>
+                </mrow>
+              </math>
+            </div>
           </div>
-
-          <div class="eq-block">
-            <p class="eq-title">Spatial covariance (Mat&#233;rn GP)</p>
-            <p class="eq-line">Cov[w(s<sub>i</sub>), w(s<sub>j</sub>)] = &#963;<sup>2</sup> {2<sup>1-&#957;</sup> / &#915;(&#957;)} (&#954; d<sub>ij</sub>)<sup>&#957;</sup> K<sub>&#957;</sub>(&#954; d<sub>ij</sub>)</p>
+          <div class="model-actions">
+            <button class="model-q-btn" type="button" data-topic="spglm_math">Want detailed mathematical modeling for spGLM?</button>
+            <button class="model-q-btn" type="button" data-topic="spglm_strengths">Strengths and limits of spGLM?</button>
           </div>
-
-          <div class="eq-block">
-            <p class="eq-title">Posterior target</p>
-            <p class="eq-line">&#960;(&#946;, w, &#952; | y) &#8733; [&prod;<sub>i</sub> Bin(y<sub>i</sub> | n<sub>i</sub>, p<sub>i</sub>)] &#960;(&#946;) &#960;(w | &#952;) &#960;(&#952;)</p>
-          </div>
-
-          <ul>
-            <li><strong>Strengths:</strong> flexible covariance specification; strong generative interpretation.</li>
-            <li><strong>Limitations:</strong> dense covariance inversion is expensive for large cluster counts.</li>
-          </ul>
         </article>
 
         <article class="model-card">
-          <h3>INLA-SPDE (Latent GMRF Approximation)</h3>
-          <p><strong>What it does:</strong> approximates the same Mat&#233;rn field via a mesh and sparse precision matrix for fast Bayesian inference.</p>
-
+          <h3>INLA-SPDE (Mesh-Based Bayesian Approximation)</h3>
+          <p><strong>Basic explanation:</strong> INLA-SPDE represents the spatial field on a triangulated mesh and performs fast approximate Bayesian inference using sparse precision matrices.</p>
           <div class="eq-block">
-            <p class="eq-title">Observation and linear predictor</p>
-            <p class="eq-line">Y<sub>i</sub> | &#951;<sub>i</sub> ~ Binomial(n<sub>i</sub>, logit<sup>-1</sup>(&#951;<sub>i</sub>))</p>
-            <p class="eq-line">&#951;<sub>i</sub> = x<sub>i</sub><sup>T</sup>&#946; + A<sub>i&#183;</sub>&#969; + u<sub>state(i)</sub> + u<sub>district(i)</sub></p>
+            <p class="eq-title">Core predictor form</p>
+            <div class="eq-math">
+              <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+                <mrow>
+                  <msub><mi>&eta;</mi><mi>i</mi></msub>
+                  <mo>=</mo>
+                  <msup><msub><mi>x</mi><mi>i</mi></msub><mi>T</mi></msup><mi>&beta;</mi>
+                  <mo>+</mo><msub><mi>A</mi><mrow><mi>i</mi><mo>&#183;</mo></mrow></msub><mi>&omega;</mi>
+                  <mo>,</mo>
+                  <msub><mi>p</mi><mi>i</mi></msub><mo>=</mo><msup><mi>logit</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup><mo>(</mo><msub><mi>&eta;</mi><mi>i</mi></msub><mo>)</mo>
+                </mrow>
+              </math>
+            </div>
           </div>
-
-          <div class="eq-block">
-            <p class="eq-title">SPDE representation</p>
-            <p class="eq-line">(&#954;<sup>2</sup> - &#916;)<sup>&#945;/2</sup>(&#964; w(s)) = W(s)</p>
-            <p class="eq-line">w(s) &#8776; &sum;<sub>k=1</sub><sup>K</sup> &#968;<sub>k</sub>(s) &#969;<sub>k</sub>, &nbsp; &#969; ~ N(0, Q(&#954;, &#964;)<sup>-1</sup>)</p>
+          <div class="model-actions">
+            <button class="model-q-btn" type="button" data-topic="inla_math">Want detailed mathematical modeling for INLA-SPDE?</button>
+            <button class="model-q-btn" type="button" data-topic="inla_strengths">Strengths and limits of INLA-SPDE?</button>
           </div>
-
-          <div class="eq-block">
-            <p class="eq-title">INLA marginal approximation</p>
-            <p class="eq-line">&#960;(x<sub>j</sub> | y) = &int; &#960;(x<sub>j</sub> | &#952;, y) &#960;(&#952; | y) d&#952;</p>
-          </div>
-
-          <ul>
-            <li><strong>Strengths:</strong> scalable with sparse precision matrices; fast posterior marginals.</li>
-            <li><strong>Limitations:</strong> approximation quality can depend on mesh/prior settings.</li>
-          </ul>
         </article>
+      </div>
+
+      <div class="model-compare-panel">
+        <h3>Compare Both Methods</h3>
+        <p>Comparing both is essential for robustness. Agreement indicates stable signal, while disagreement signals model-sensitive or data-sparse areas that need cautious interpretation.</p>
+        <div class="model-actions">
+          <button class="model-q-btn" type="button" data-topic="compare_why">Why should we compare spGLM and INLA-SPDE?</button>
+          <button class="model-q-btn" type="button" data-topic="compare_interpret">How should agreement vs disagreement be interpreted?</button>
+        </div>
       </div>
 
       <div class="table-wrap">
         <table class="table">
           <thead>
             <tr>
-              <th>Comparison Dimension</th>
+              <th>Dimension</th>
               <th>spGLM</th>
               <th>INLA-SPDE</th>
-              <th>Why Compare Here</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>Spatial field representation</td>
+              <td>Spatial representation</td>
               <td>Dense Gaussian process covariance</td>
-              <td>Mesh-based Mat&#233;rn GMRF</td>
-              <td>Checks if hotspot structure is robust to representation choice.</td>
+              <td>Mat&#233;rn field via sparse mesh representation</td>
             </tr>
             <tr>
-              <td>Inference engine</td>
-              <td>Posterior sampling/optimization over GP parameters</td>
-              <td>Deterministic nested Laplace approximation</td>
-              <td>Separates computational approximation effects from data effects.</td>
+              <td>Inference style</td>
+              <td>Posterior sampling / optimization over GP structure</td>
+              <td>Integrated Nested Laplace Approximation</td>
             </tr>
             <tr>
-              <td>Computational scaling</td>
-              <td>Heavier at large <code>n</code> due to dense matrix operations</td>
-              <td>Faster for large domains via sparse precision algebra</td>
-              <td>Important for repeated MR scenarios, vaccines, and states.</td>
+              <td>Scaling profile</td>
+              <td>Heavier for large cluster counts</td>
+              <td>Typically faster for large geographies</td>
             </tr>
             <tr>
-              <td>Practical output behavior</td>
-              <td>Flexible, can be smoother or rougher based on kernel settings</td>
-              <td>Mesh-aware smoothing with explicit boundary control</td>
-              <td>Explains differences in uncertainty surfaces and coldspot stability.</td>
+              <td>Primary risk</td>
+              <td>Compute burden</td>
+              <td>Approximation and mesh-choice sensitivity</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <p class="note"><strong>Interpretation rule:</strong> when both methods agree on low-coverage or high-dropout locations, those pockets are high-confidence priorities. When they differ, prioritize locations with consistently high uncertainty for additional field validation before intervention scaling.</p>
+      <p class="note"><strong>Decision rule:</strong> prioritize hotspots that remain high-risk under both models; route high-disagreement locations to uncertainty-aware field validation.</p>
     </section>
+
+    <div class="model-popup" id="modelPopup" aria-hidden="true">
+      <button class="model-popup-backdrop" id="modelPopupBackdrop" type="button" aria-label="Close model details"></button>
+      <section class="model-popup-card" role="dialog" aria-modal="true" aria-labelledby="modelPopupTitle">
+        <button class="model-popup-close" id="modelPopupClose" type="button" aria-label="Close">&times;</button>
+        <p class="model-popup-tag" id="modelPopupTag"></p>
+        <h3 id="modelPopupTitle"></h3>
+        <p class="model-popup-intro" id="modelPopupIntro"></p>
+        <div class="model-popup-body" id="modelPopupBody"></div>
+      </section>
+    </div>
 
     <section class="card two-col">
       <div>
         <h2>5) Spatial Dependence and Mesh Construction</h2>
         <p>Adjacency is encoded through coordinate-driven mesh projection, not polygon-neighbor lists.</p>
-        <div class="math">M = (V, T),   V = mesh vertices, T = triangles</div>
-        <div class="math">A = A(loc, M)  (projection matrix from cluster/raster locations to mesh basis)</div>
-        <div class="math">w(s) approx sum_{k=1}^{K} psi_k(s) * omega_k</div>
+        <div class="math">
+          <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+            <mrow>
+              <mi>M</mi><mo>=</mo><mo>(</mo><mi>V</mi><mo>,</mo><mi>T</mi><mo>)</mo>
+              <mo>,</mo>
+              <mi>V</mi><mo>=</mo><mtext>mesh vertices</mtext>
+              <mo>,</mo>
+              <mi>T</mi><mo>=</mo><mtext>triangles</mtext>
+            </mrow>
+          </math>
+        </div>
+        <div class="math">
+          <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+            <mrow>
+              <mi>A</mi><mo>=</mo><mi>A</mi><mo>(</mo><mi>loc</mi><mo>,</mo><mi>M</mi><mo>)</mo>
+            </mrow>
+          </math>
+        </div>
+        <div class="math">
+          <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+            <mrow>
+              <mi>w</mi><mo>(</mo><mi>s</mi><mo>)</mo><mo>&asymp;</mo>
+              <munderover><mo>&sum;</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>K</mi></munderover>
+              <msub><mi>&psi;</mi><mi>k</mi></msub><mo>(</mo><mi>s</mi><mo>)</mo>
+              <msub><mi>&omega;</mi><mi>k</mi></msub>
+            </mrow>
+          </math>
+        </div>
         <p>Raster multilevel labels are propagated through nearest-neighbor assignment for state/district factors.</p>
       </div>
       <div>
         <h2>6) Matérn-SPDE Formulation</h2>
-        <div class="math">(kappa^2 - Delta)^(alpha/2) w(s) = W(s)</div>
-        <div class="math">omega ~ N(0, Q(kappa, tau)^{-1})</div>
+        <div class="math">
+          <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+            <mrow>
+              <msup>
+                <mrow><mo>(</mo><msup><mi>&kappa;</mi><mn>2</mn></msup><mo>-</mo><mi>&Delta;</mi><mo>)</mo></mrow>
+                <mrow><mi>&alpha;</mi><mo>/</mo><mn>2</mn></mrow>
+              </msup>
+              <mi>w</mi><mo>(</mo><mi>s</mi><mo>)</mo>
+              <mo>=</mo>
+              <mi>W</mi><mo>(</mo><mi>s</mi><mo>)</mo>
+            </mrow>
+          </math>
+        </div>
+        <div class="math">
+          <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+            <mrow>
+              <mi>&omega;</mi><mo>&sim;</mo>
+              <mi>N</mi>
+              <mo>(</mo>
+              <mn>0</mn><mo>,</mo>
+              <msup><mi>Q</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup>
+              <mo>(</mo><mi>&kappa;</mi><mo>,</mo><mi>&tau;</mi><mo>)</mo>
+              <mo>)</mo>
+            </mrow>
+          </math>
+        </div>
         <p>This produces a sparse Gaussian Markov random field representation compatible with INLA.</p>
         <h3>Boundary/Sparse Handling</h3>
         <ul>
@@ -476,15 +599,64 @@
           <li>2.5th and 97.5th posterior quantiles</li>
           <li>relative uncertainty ratio</li>
         </ul>
-        <div class="math">U_g = sd_g / mu_g</div>
+        <div class="math">
+          <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+            <mrow>
+              <msub><mi>U</mi><mi>g</mi></msub>
+              <mo>=</mo>
+              <mfrac>
+                <msub><mi>sd</mi><mi>g</mi></msub>
+                <msub><mi>&mu;</mi><mi>g</mi></msub>
+              </mfrac>
+            </mrow>
+          </math>
+        </div>
         <p>High <code>U_g</code> indicates unstable estimates requiring cautious interpretation.</p>
       </div>
       <div>
         <h2>9) Diagnostics and Fit Comparison</h2>
         <p>Current diagnostics include coverage/error/correlation summaries and CI checks; explicit residual Moran's I/variogram diagnostics are not yet fully automated in the committed pipeline.</p>
-        <div class="math">RMSE = sqrt((1/N) * sum_i (y_i - y_hat_i)^2)</div>
-        <div class="math">Corr = cor(y, y_hat)</div>
-        <div class="math">Coverage95 = (1/N) * sum_i 1[y_i in [q0.025_i, q0.975_i]]</div>
+        <div class="math">
+          <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+            <mrow>
+              <mi>RMSE</mi><mo>=</mo>
+              <msqrt>
+                <mrow>
+                  <mfrac><mn>1</mn><mi>N</mi></mfrac>
+                  <munderover><mo>&sum;</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover>
+                  <msup>
+                    <mrow>
+                      <mo>(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>-</mo><msub><mover><mi>y</mi><mo>^</mo></mover><mi>i</mi></msub><mo>)</mo>
+                    </mrow>
+                    <mn>2</mn>
+                  </msup>
+                </mrow>
+              </msqrt>
+            </mrow>
+          </math>
+        </div>
+        <div class="math">
+          <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+            <mrow>
+              <mi>Corr</mi><mo>=</mo><mi>cor</mi><mo>(</mo><mi>y</mi><mo>,</mo><mover><mi>y</mi><mo>^</mo></mover><mo>)</mo>
+            </mrow>
+          </math>
+        </div>
+        <div class="math">
+          <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+            <mrow>
+              <msub><mi>Coverage</mi><mn>95</mn></msub><mo>=</mo>
+              <mfrac><mn>1</mn><mi>N</mi></mfrac>
+              <munderover><mo>&sum;</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover>
+              <mtext>1</mtext>
+              <mo>[</mo>
+              <msub><mi>y</mi><mi>i</mi></msub>
+              <mo>&isin;</mo>
+              <mo>[</mo><msub><mi>q</mi><mrow><mn>0.025</mn><mo>,</mo><mi>i</mi></mrow></msub><mo>,</mo><msub><mi>q</mi><mrow><mn>0.975</mn><mo>,</mo><mi>i</mi></mrow></msub><mo>]</mo>
+              <mo>]</mo>
+            </mrow>
+          </math>
+        </div>
       </div>
     </section>
 
@@ -567,5 +739,6 @@
 <script src="../js/geospatial-lab.js"></script>
 <script src="../js/geospatial-recap.js"></script>
 <script src="../js/geospatial-lab-guide.js"></script>
+<script src="../js/geospatial-model-popups.js"></script>
 </body>
 </html>
