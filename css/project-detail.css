@@ -193,22 +193,24 @@ h1 {
   background: linear-gradient(130deg, rgba(255, 255, 255, 0.92), rgba(255, 242, 232, 0.85));
   color: #6c3222;
   border-radius: 999px;
-  padding: 0.45rem 0.82rem;
+  padding: 0.5rem 0.86rem;
   font-family: 'DM Mono', monospace;
-  font-size: 0.69rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: 0.74rem;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  line-height: 1.2;
   cursor: pointer;
   transform: translateY(0);
   animation: bubbleFloat var(--bubble-duration, 6.2s) ease-in-out var(--bubble-delay, 0s) infinite;
-  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .fact-bubble:hover,
 .fact-bubble:focus-visible {
   border-color: #c8522a;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(200, 82, 42, 0.16);
+  transform: translateY(-3px) scale(1.02);
+  background: linear-gradient(130deg, rgba(255, 251, 247, 0.96), rgba(255, 235, 220, 0.92));
+  box-shadow: 0 8px 20px rgba(200, 82, 42, 0.18);
 }
 
 .fact-bubble.active {
@@ -216,6 +218,12 @@ h1 {
   background: linear-gradient(130deg, rgba(252, 239, 229, 0.98), rgba(255, 226, 207, 0.98));
   color: #4f1f14;
   box-shadow: 0 7px 18px rgba(200, 82, 42, 0.22);
+}
+
+.fact-bubble::before {
+  content: "Q ";
+  font-weight: 700;
+  color: #9b4629;
 }
 
 @keyframes bubbleFloat {
@@ -240,6 +248,50 @@ h1 {
 
 .fact-detail h3 {
   margin-top: 0;
+}
+
+.fact-detail-body {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 0.8rem;
+  align-items: start;
+}
+
+.fact-media {
+  margin: 0;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.28rem;
+}
+
+.fact-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.fact-media figcaption {
+  margin-top: 0.35rem;
+  font-size: 0.73rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.fact-copy p {
+  margin-top: 0;
+}
+
+.fact-bullets {
+  margin: 0.5rem 0 0.1rem 1rem;
+  padding: 0;
+}
+
+.fact-bullets:empty {
+  display: none;
+}
+
+.fact-bullets li {
+  margin: 0.3rem 0;
 }
 
 .quiz-wrap {
@@ -644,6 +696,10 @@ h1 {
 
   .quiz-option {
     font-size: 0.88rem;
+  }
+
+  .fact-detail-body {
+    grid-template-columns: 1fr;
   }
 
   .two-col {

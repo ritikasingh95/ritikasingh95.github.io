@@ -28,13 +28,22 @@
   <main class="content">
     <section class="card recap-card">
       <h2>Project Recap</h2>
-      <p class="recap-intro">Explore the project as interactive facts instead of static text. Each floating bubble captures one core point of the study design, evidence challenge, or policy relevance.</p>
+      <p class="recap-intro">Click any question bubble below to reveal the answer, context, and key points for that topic.</p>
 
       <div class="fact-bubble-board" id="factBubbleBoard" aria-label="Project fact bubbles"></div>
 
       <div class="recap-panel fact-detail" id="factDetail">
-        <h3 id="factDetailTitle">Select any bubble</h3>
-        <p id="factDetailText">Tap a floating fact to read the full point.</p>
+        <h3 id="factDetailTitle">Q. Choose a question bubble</h3>
+        <div class="fact-detail-body">
+          <figure class="fact-media" id="factMediaWrap" hidden>
+            <img id="factImage" src="" alt="">
+            <figcaption id="factImageCaption"></figcaption>
+          </figure>
+          <div class="fact-copy">
+            <p id="factDetailText">A. Select a bubble above to see the explanation.</p>
+            <ul class="fact-bullets" id="factBulletList"></ul>
+          </div>
+        </div>
       </div>
 
       <div class="recap-panel">

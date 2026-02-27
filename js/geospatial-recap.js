@@ -4,6 +4,10 @@
   const board = document.getElementById("factBubbleBoard");
   const detailTitle = document.getElementById("factDetailTitle");
   const detailText = document.getElementById("factDetailText");
+  const factMediaWrap = document.getElementById("factMediaWrap");
+  const factImage = document.getElementById("factImage");
+  const factImageCaption = document.getElementById("factImageCaption");
+  const factBulletList = document.getElementById("factBulletList");
 
   const quizProgress = document.getElementById("quizProgress");
   const quizQuestion = document.getElementById("quizQuestion");
@@ -18,77 +22,89 @@
 
   const facts = [
     {
-      chip: "Public Health Need",
-      title: "Why this project matters",
-      text: "Childhood vaccination is one of the strongest tools for reducing preventable disease and early child mortality. Reliable local estimates are required to translate this into real service action."
+      chip: "Do you know why maternal recall matters most here?",
+      title: "Maternal recall is central in India-like settings",
+      text: "In countries like India, maternal recall is not a secondary detail. It directly affects estimated immunization coverage in places where vaccination cards are missing or poorly retained.",
+      image: {
+        src: "https://upload.wikimedia.org/wikipedia/commons/4/45/Babyimmunization.jpg",
+        alt: "Mother holding a child during an immunization session",
+        caption: "Mother-child immunization interaction. Image source: Wikimedia Commons."
+      },
+      bullets: [
+        "Card availability varies across states and districts, so recall often fills major documentation gaps.",
+        "Including recall prevents exclusion of hard-to-reach households from coverage estimation.",
+        "Recall assumptions can shift local coldspot identification and district ranking.",
+        "Comparing MR=0 and MR=1 separates documentation effects from true service-delivery gaps.",
+        "This is critical for campaigns targeting underserved populations in India."
+      ]
     },
     {
-      chip: "India Context",
+      chip: "Do you think national averages are enough for planning?",
       title: "Scale and policy setting",
       text: "India's NFHS and UIP operate at national scale, and UIP targets more than 27 million children annually. Even at this scale, district and state averages can hide local inequities, so planning needs finer geographic intelligence."
     },
     {
-      chip: "Core Data Challenge",
+      chip: "Do you know the biggest data challenge in coverage measurement?",
       title: "Card records vs maternal recall",
       text: "In household surveys, vaccination status comes from cards when available, otherwise from maternal recall. This creates a tradeoff between larger sample coverage and measurement reliability."
     },
     {
-      chip: "Card Retention",
+      chip: "Do you think card availability is uniform across India?",
       title: "Documentation is uneven",
       text: "Vaccination cards are critical for correct dose tracking and avoiding both missed and unnecessary doses. Card availability varies substantially across states and union territories."
     },
     {
-      chip: "Prior Evidence",
+      chip: "Do you know recall can both help and bias estimates?",
       title: "Recall quality is not uniform",
       text: "Past studies report mixed recall accuracy; for example, evidence from Senegal showed maternal recall can underestimate coverage relative to documented records."
     },
     {
-      chip: "Pipeline Design",
+      chip: "Do you know how the cluster-to-grid pipeline works?",
       title: "Cluster-to-grid Bayesian system",
       text: "The pipeline trains on DHS or NFHS cluster points and predicts on raster grids with spatial Bayesian models to generate high-resolution coverage and uncertainty surfaces."
     },
     {
-      chip: "Outcomes and Time",
+      chip: "Do you know what outcomes and years are modeled?",
       title: "What is modeled",
       text: "Primary targets are BCG, DPT, and MCV outcomes across NFHS-4 (2015-2016) and NFHS-5 (2019-2021), enabling structured cross-round comparison."
     },
     {
-      chip: "Scenario Testing",
+      chip: "Do you think MR=0 and MR=1 will give the same map?",
       title: "Recall impact is modeled explicitly",
       text: "Two regimes are estimated side-by-side: MR=0 (card only) and MR=1 (card plus maternal recall). This exposes where recall materially shifts spatial estimates."
     },
     {
-      chip: "Spatial Heterogeneity",
+      chip: "Do you know why spatial modeling is essential here?",
       title: "Beyond averages",
       text: "Hierarchical spatial models with structured random effects capture sub-national correlation and heterogeneity, revealing local coldspots and multi-dose dropout pockets."
     },
     {
-      chip: "Priority Populations",
+      chip: "Do you think all communities are equally covered?",
       title: "Who benefits most",
       text: "Hyper-local maps improve targeting for underserved groups such as migrant, tribal, and geographically isolated populations often prioritized in Mission Indradhanush programs."
     },
     {
-      chip: "Program Alignment",
+      chip: "Do you know how this supports real campaign operations?",
       title: "Operational planning use",
       text: "The output supports campaign monitoring and microplanning for large initiatives, including Intensified Mission Indradhanush. IMI 5.0 phase windows in 2023 (August, September, October) underscore why time-sensitive local intelligence is needed."
     },
     {
-      chip: "Coverage Contradictions",
+      chip: "Do you think admin and survey numbers always agree?",
       title: "Why deeper investigation is needed",
       text: "Administrative reporting suggested gains after early Mission Indradhanush rounds, while NFHS-4 still showed weaker movement in states such as Tamil Nadu, Haryana, Himachal Pradesh, Uttarakhand, and Maharashtra. This mismatch requires uncertainty-aware local diagnostics."
     },
     {
-      chip: "Discrepancy Resolution",
+      chip: "Do you know what helps resolve those contradictions?",
       title: "Admin vs survey gaps",
       text: "Dual-scenario modeling helps explain why administrative reports and household survey estimates diverge by quantifying uncertainty and recall sensitivity in each region."
     },
     {
-      chip: "Innovation",
+      chip: "Do you know what is novel in this project design?",
       title: "What is new in this work",
       text: "The project combines spatial-temporal Bayesian modeling, explicit recall assumption testing, high-resolution mapping, multi-dose dropout analysis, and NFHS cross-round comparison in one pipeline."
     },
     {
-      chip: "Final Contribution",
+      chip: "Do you know the final policy contribution?",
       title: "Decision-ready outcome",
       text: "The result is localized, uncertainty-calibrated evidence that supports better resource allocation, sharper intervention targeting, and more defensible immunization policy decisions."
     }
@@ -165,6 +181,8 @@
       bubble.type = "button";
       bubble.className = "fact-bubble";
       bubble.textContent = fact.chip;
+      bubble.title = "Click to reveal answer";
+      bubble.setAttribute("aria-label", fact.chip + " Click to reveal answer");
       bubble.style.setProperty("--bubble-delay", (index * 0.14).toFixed(2) + "s");
       bubble.style.setProperty("--bubble-duration", (5.4 + (index % 5) * 0.45).toFixed(2) + "s");
       bubble.addEventListener("click", function () {
@@ -182,8 +200,32 @@
       node.classList.toggle("active", idx === index);
     });
 
-    detailTitle.textContent = fact.title;
-    detailText.textContent = fact.text;
+    detailTitle.textContent = "Q. " + fact.chip;
+    detailText.textContent = "A. " + fact.text;
+
+    if (factMediaWrap && factImage && factImageCaption) {
+      if (fact.image && fact.image.src) {
+        factImage.src = fact.image.src;
+        factImage.alt = fact.image.alt || "";
+        factImageCaption.textContent = fact.image.caption || "";
+        factMediaWrap.hidden = false;
+      } else {
+        factImage.src = "";
+        factImage.alt = "";
+        factImageCaption.textContent = "";
+        factMediaWrap.hidden = true;
+      }
+    }
+
+    if (factBulletList) {
+      factBulletList.innerHTML = "";
+      const bullets = Array.isArray(fact.bullets) ? fact.bullets : [];
+      bullets.forEach(function (point) {
+        const li = document.createElement("li");
+        li.textContent = point;
+        factBulletList.appendChild(li);
+      });
+    }
   }
 
   function bindQuiz() {
