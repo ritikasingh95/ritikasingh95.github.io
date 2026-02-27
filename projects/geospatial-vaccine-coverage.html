@@ -28,33 +28,58 @@
   <main class="content">
     <section class="card recap-card">
       <h2>Project Recap</h2>
-      <p class="recap-intro">Click any question bubble below to reveal the answer, context, and key points for that topic.</p>
+      <p class="recap-intro">Tap a floating bubble to open a quick answer popup.</p>
+
+      <div class="bubble-legend" aria-label="Bubble category legend">
+        <span class="legend-chip legend-basic">Basic</span>
+        <span class="legend-chip legend-method">Method</span>
+        <span class="legend-chip legend-interpretation">Interpretation</span>
+      </div>
 
       <div class="fact-bubble-board" id="factBubbleBoard" aria-label="Project fact bubbles"></div>
 
-      <div class="recap-panel fact-detail" id="factDetail">
-        <h3 id="factDetailTitle">Q. Choose a question bubble</h3>
-        <div class="fact-detail-body">
-          <figure class="fact-media" id="factMediaWrap" hidden>
-            <img id="factImage" src="" alt="">
-            <figcaption id="factImageCaption"></figcaption>
-          </figure>
-          <div class="fact-copy">
-            <p id="factDetailText">A. Select a bubble above to see the explanation.</p>
-            <ul class="fact-bullets" id="factBulletList"></ul>
-          </div>
-        </div>
-      </div>
-
       <div class="recap-panel">
         <h3>Pipeline Outputs</h3>
-        <ul class="recap-list">
-          <li>Continuous vaccination coverage maps</li>
-          <li>Uncertainty (posterior standard deviation) layers</li>
-          <li>Multi-dose dropout maps</li>
-          <li>State-level evaluation summaries</li>
-          <li>Direct scenario comparisons (card-only vs card + maternal recall)</li>
-        </ul>
+        <p class="output-graph-sub">What the modeling pipeline produces for policy and program action</p>
+        <div class="output-graph" role="group" aria-label="Pipeline outputs graph">
+          <svg class="output-links" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <line x1="50" y1="50" x2="18" y2="20"></line>
+            <line x1="50" y1="50" x2="50" y2="12"></line>
+            <line x1="50" y1="50" x2="82" y2="20"></line>
+            <line x1="50" y1="50" x2="22" y2="84"></line>
+            <line x1="50" y1="50" x2="78" y2="84"></line>
+          </svg>
+
+          <article class="output-node output-node--coverage">
+            <h4>Coverage Surfaces</h4>
+            <p>Continuous vaccination coverage maps</p>
+          </article>
+
+          <article class="output-node output-node--uncertainty">
+            <h4>Uncertainty Layers</h4>
+            <p>Posterior standard deviation layers</p>
+          </article>
+
+          <article class="output-node output-node--dropout">
+            <h4>Dropout Mapping</h4>
+            <p>Multi-dose dropout maps</p>
+          </article>
+
+          <article class="output-node output-node--state">
+            <h4>State Diagnostics</h4>
+            <p>State-level evaluation summaries</p>
+          </article>
+
+          <article class="output-node output-node--scenario">
+            <h4>Scenario Contrast</h4>
+            <p>Card-only vs card + maternal recall comparisons</p>
+          </article>
+
+          <div class="output-hub">
+            <p>Spatial Bayesian Pipeline</p>
+            <small>DHS/NFHS clusters -> raster predictions</small>
+          </div>
+        </div>
       </div>
 
       <div class="quiz-wrap" id="recapQuiz">
@@ -71,6 +96,21 @@
 
       <p class="recap-close">This framework moves beyond aggregate coverage metrics to deliver localized, uncertainty-calibrated insights for targeted immunization action.</p>
     </section>
+
+    <div class="fact-popup" id="factPopup" hidden>
+      <button class="fact-popup-backdrop" id="factPopupBackdrop" type="button" aria-label="Close popup"></button>
+      <section class="fact-popup-card" role="dialog" aria-modal="true" aria-labelledby="factPopupTitle">
+        <button class="fact-popup-close" id="factPopupClose" type="button" aria-label="Close">&times;</button>
+        <p class="fact-popup-tag" id="factPopupTag"></p>
+        <h3 id="factPopupTitle"></h3>
+        <p class="fact-popup-text" id="factPopupText"></p>
+        <figure class="fact-popup-media" id="factPopupMedia" hidden>
+          <img id="factPopupImage" src="" alt="">
+          <figcaption id="factPopupCaption"></figcaption>
+        </figure>
+        <ul class="fact-popup-bullets" id="factPopupBullets"></ul>
+      </section>
+    </div>
 
     <section class="card" id="mesh-lab">
       <h2>2) Interactive Mesh and Sensitivity Lab</h2>
