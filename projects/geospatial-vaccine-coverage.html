@@ -42,13 +42,10 @@
         <h3>Pipeline Outputs</h3>
         <p class="output-graph-sub">What the modeling pipeline produces for policy and program action</p>
         <div class="output-graph" role="group" aria-label="Pipeline outputs graph">
-          <svg class="output-links" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-            <line x1="50" y1="50" x2="18" y2="20"></line>
-            <line x1="50" y1="50" x2="50" y2="12"></line>
-            <line x1="50" y1="50" x2="82" y2="20"></line>
-            <line x1="50" y1="50" x2="22" y2="84"></line>
-            <line x1="50" y1="50" x2="78" y2="84"></line>
-          </svg>
+          <div class="output-hub">
+            <p>Spatial Bayesian Pipeline</p>
+            <small>DHS/NFHS clusters -> raster predictions</small>
+          </div>
 
           <article class="output-node output-node--coverage">
             <h4>Coverage Surfaces</h4>
@@ -74,11 +71,6 @@
             <h4>Scenario Contrast</h4>
             <p>Card-only vs card + maternal recall comparisons</p>
           </article>
-
-          <div class="output-hub">
-            <p>Spatial Bayesian Pipeline</p>
-            <small>DHS/NFHS clusters -> raster predictions</small>
-          </div>
         </div>
       </div>
 
@@ -97,32 +89,39 @@
       <p class="recap-close">This framework moves beyond aggregate coverage metrics to deliver localized, uncertainty-calibrated insights for targeted immunization action.</p>
     </section>
 
-    <div class="fact-popup" id="factPopup" hidden>
+    <div class="fact-popup" id="factPopup" aria-hidden="true">
       <button class="fact-popup-backdrop" id="factPopupBackdrop" type="button" aria-label="Close popup"></button>
       <section class="fact-popup-card" role="dialog" aria-modal="true" aria-labelledby="factPopupTitle">
         <button class="fact-popup-close" id="factPopupClose" type="button" aria-label="Close">&times;</button>
         <p class="fact-popup-tag" id="factPopupTag"></p>
         <h3 id="factPopupTitle"></h3>
-        <p class="fact-popup-text" id="factPopupText"></p>
-        <figure class="fact-popup-media" id="factPopupMedia" hidden>
-          <img id="factPopupImage" src="" alt="">
-          <figcaption id="factPopupCaption"></figcaption>
-        </figure>
-        <ul class="fact-popup-bullets" id="factPopupBullets"></ul>
+        <p class="fact-popup-prompt" id="factPopupPrompt"></p>
+        <div class="fact-popup-options" id="factPopupOptions"></div>
+        <p class="fact-popup-result" id="factPopupResult"></p>
+
+        <div class="fact-popup-answer" id="factPopupAnswer" hidden>
+          <p class="fact-popup-text" id="factPopupText"></p>
+          <ul class="fact-popup-bullets" id="factPopupBullets"></ul>
+        </div>
       </section>
     </div>
 
     <section class="card" id="mesh-lab">
       <h2>2) Interactive Mesh and Sensitivity Lab</h2>
-      <p>Use this panel to interactively vary state, mesh granularity, model family, and maternal-recall regime. The mesh preview and metrics update in real time to show how uncertainty and fit move with each design choice.</p>
-      <p>The 0/1 vaccination point layer is generated from DHS birth-recode pipeline outputs (summary export in <code>data/cluster-vax-summary.json</code>).</p>
-      <p>State boundaries are loaded from real GeoJSON shape files in <code>data/india-states/</code>.</p>
-      <ul>
-        <li>DHS birth recode input: <code>KidsRecode/IAKR7DFL.SAV</code> filtered to age 12-23 months and alive children.</li>
-        <li>Per-child 0/1 vaccination computed exactly as card-or-maternal-recall for each vaccine indicator.</li>
-        <li>Cluster GPS merge done via <code>DHSCLUST = ClusterID</code> from <code>ShapeFile/IAGE7AFL.shp</code>, then exported to <code>Cluster_data.csv</code>.</li>
-        <li>This page uses those generated <code>NFHS4_IndividualData.csv</code>/<code>NFHS5_IndividualData.csv</code> plus <code>Cluster_data.csv</code> to build cluster-level 0/1 summaries.</li>
-      </ul>
+      <p>Use this lab to test how modelling choices change spatial fit, uncertainty, and interpretation in real time.</p>
+      <p>The point layer is built from child-level vaccination responses linked with mapped survey clusters for children aged 12-23 months who were alive at interview. Vaccination status is computed from documented card evidence and, when selected, maternal recall.</p>
+      <p>State boundaries come from official geographic polygons. Child records and cluster coordinates are joined through the shared cluster identifier, then summarized into cluster-level vaccinated versus unvaccinated counts for each survey round.</p>
+
+      <div class="lab-guide">
+        <p class="lab-guide-intro">Click a quick question to see what each control changes and how that impacts interpretation.</p>
+        <div class="lab-guide-legend" aria-label="Lab impact categories">
+          <span class="lab-guide-key lab-guide-key--data">Data</span>
+          <span class="lab-guide-key lab-guide-key--model">Model</span>
+          <span class="lab-guide-key lab-guide-key--mesh">Mesh</span>
+          <span class="lab-guide-key lab-guide-key--action">Action</span>
+        </div>
+        <div class="lab-guide-chips" id="labGuideChips"></div>
+      </div>
 
       <div class="lab-grid">
         <div class="lab-controls">
@@ -276,6 +275,22 @@
       </div>
     </section>
 
+    <div class="lab-guide-popup" id="labGuidePopup" aria-hidden="true">
+      <button class="lab-guide-backdrop" id="labGuideBackdrop" type="button" aria-label="Close impact popup"></button>
+      <section class="lab-guide-card" role="dialog" aria-modal="true" aria-labelledby="labGuideTitle">
+        <button class="lab-guide-close" id="labGuideClose" type="button" aria-label="Close">&times;</button>
+        <p class="lab-guide-tag" id="labGuideTag"></p>
+        <h3 id="labGuideTitle"></h3>
+        <p class="lab-guide-prompt" id="labGuidePrompt"></p>
+        <div class="lab-guide-options" id="labGuideOptions"></div>
+        <p class="lab-guide-result" id="labGuideResult"></p>
+        <div class="lab-guide-answer" id="labGuideAnswer" hidden>
+          <p id="labGuideAnswerText"></p>
+          <ul id="labGuideImpactList"></ul>
+        </div>
+      </section>
+    </div>
+
     <section class="card two-col">
       <div>
         <h2>3) Spatial Scale and Why It Works</h2>
@@ -426,5 +441,6 @@
 </div>
 <script src="../js/geospatial-lab.js"></script>
 <script src="../js/geospatial-recap.js"></script>
+<script src="../js/geospatial-lab-guide.js"></script>
 </body>
 </html>
